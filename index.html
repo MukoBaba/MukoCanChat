@@ -4,335 +4,147 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MukoCan Chat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #080612;
-      --card: #100d1f;
-      --border: #2a1f4a;
-      --accent: #7c3aed;
-      --accent2: #a855f7;
-      --gold: #f59e0b;
-      --text: #e8e0f5;
-      --muted: #7c6fa0;
-      --msg-bg: #15102a;
-      --success: #10b981;
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(ellipse at 30% 20%, rgba(124,58,237,0.12) 0%, transparent 50%),
-                  radial-gradient(ellipse at 70% 80%, rgba(168,85,247,0.08) 0%, transparent 50%);
-      pointer-events: none; z-index: 0;
-    }
-    .container { width: 100%; max-width: 480px; position: relative; z-index: 1; }
-    #joinScreen {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 28px;
-      box-shadow: 0 0 60px rgba(124,58,237,0.15);
-    }
-    .logo { text-align: center; margin-bottom: 28px; }
-    .logo h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 32px; font-weight: 800;
-      color: var(--gold); letter-spacing: -0.5px;
-    }
-    .logo p { color: var(--muted); font-size: 14px; margin-top: 6px; }
-    .field { margin-bottom: 14px; }
-    .field label {
-      display: block; font-size: 12px; font-weight: 500;
-      color: var(--muted); text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 6px;
-    }
-    .field input {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px 16px;
-      color: var(--text); font-family: 'DM Sans', sans-serif;
-      font-size: 16px; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .field input:focus {
-      border-color: var(--accent2);
-      box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
-    }
-    .field input::placeholder { color: var(--muted); }
-    .btn-primary {
-      width: 100%; padding: 16px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; border-radius: 12px; color: #fff;
-      font-family: 'Syne', sans-serif; font-size: 16px;
-      font-weight: 700; cursor: pointer; margin-top: 8px;
-      transition: opacity 0.2s, transform 0.1s; letter-spacing: 0.5px;
-    }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px; }
-    #chatScreen {
-      display: none; flex-direction: column;
-      height: 92vh; max-height: 700px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 24px; overflow: hidden;
-      box-shadow: 0 0 60px rgba(124,58,237,0.15);
-    }
-    .chat-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.02);
-    }
-    .chat-header-info h2 {
-      font-family: 'Syne', sans-serif; font-size: 16px;
-      font-weight: 700; color: var(--gold);
-    }
-    .chat-header-info span { font-size: 12px; color: var(--muted); }
-    .status-dot {
-      display: inline-block; width: 7px; height: 7px;
-      border-radius: 50%; background: var(--muted);
-      margin-right: 5px; transition: background 0.3s;
-    }
-    .status-dot.live { background: var(--success); box-shadow: 0 0 6px var(--success); }
-    .btn-leave {
-      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--muted); font-size: 13px;
-      padding: 6px 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
-      transition: all 0.2s;
-    }
-    .btn-leave:hover { color: #fff; border-color: #fff3; }
-    #chatBox {
-      flex: 1; overflow-y: auto; padding: 16px;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    #chatBox::-webkit-scrollbar { width: 4px; }
-    #chatBox::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    .msg {
-      background: var(--msg-bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 14px;
-      border-left: 3px solid var(--accent);
-      animation: msgIn 0.2s ease;
-    }
-    @keyframes msgIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .msg.mine { border-left-color: var(--gold); background: rgba(245,158,11,0.06); }
-    .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-    .msg-name { font-size: 13px; font-weight: 600; color: var(--accent2); font-family: 'Syne', sans-serif; }
-    .msg.mine .msg-name { color: var(--gold); }
-    .msg-time { font-size: 11px; color: var(--muted); }
-    .msg-text { font-size: 15px; color: var(--text); line-height: 1.4; word-break: break-word; }
-    .empty-state {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      color: var(--muted); font-size: 14px; gap: 8px; text-align: center;
-    }
-    .empty-state span { font-size: 32px; }
-    .chat-footer {
-      padding: 12px 16px; border-top: 1px solid var(--border);
-      display: flex; gap: 8px; background: rgba(255,255,255,0.02);
-    }
-    #msgInput {
-      flex: 1; background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px 16px; color: var(--text);
-      font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none;
-      transition: border-color 0.2s;
-    }
-    #msgInput:focus { border-color: var(--accent2); }
-    #msgInput::placeholder { color: var(--muted); }
-    .btn-send {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; border-radius: 12px; width: 48px; height: 48px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: opacity 0.2s, transform 0.1s;
-    }
-    .btn-send:hover { opacity: 0.9; }
-    .btn-send:active { transform: scale(0.95); }
-    .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-send svg { width: 20px; height: 20px; fill: #fff; }
-    #errorBox {
-      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 10px; padding: 10px 14px; font-size: 13px;
-      color: #fca5a5; margin-top: 10px; display: none;
-    }
+    body { font-family: Arial, sans-serif; background: #0f0620; color: #fff; }
+    .wrap { max-width: 500px; margin: 0 auto; padding: 16px; }
+    .card { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    h1 { color: #ffd54a; text-align: center; margin-bottom: 16px; font-size: 24px; }
+    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #53308b; background: #120824; color: #fff; margin-top: 10px; font-size: 16px; }
+    button { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #6a2cff; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .chat-box { height: 400px; overflow-y: auto; background: #120824; border: 1px solid #53308b; border-radius: 10px; padding: 10px; margin: 10px 0; }
+    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+    .msg .name { color: #ffd54a; font-size: 13px; font-weight: bold; }
+    .msg .text { color: #fff; font-size: 15px; margin-top: 3px; }
+    .msg .time { color: #aa98d9; font-size: 11px; }
+    .hidden { display: none; }
+    .status { color: #7dffbc; font-size: 13px; text-align: center; margin: 5px 0; }
+    .error { color: #ff6b6b; font-size: 13px; text-align: center; margin: 5px 0; background: rgba(255,0,0,0.1); padding: 8px; border-radius: 8px; }
+    .row { display: flex; gap: 8px; }
+    .row input { flex: 1; }
+    .row button { width: auto; padding: 12px 20px; margin-top: 10px; }
+    .leave-btn { background: #3d1a7a; margin-top: 8px; }
+    .info { color: #aa98d9; font-size: 13px; text-align: center; margin-top: 5px; }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-  <div id="joinScreen">
-    <div class="logo">
-      <h1>MukoCan Chat</h1>
-      <p>Oda kodu gir, ismini yaz, çevrimiçi konuş.</p>
-    </div>
-    <div class="field">
-      <label>Oda Kodu</label>
-      <input type="text" id="roomInput" placeholder="örnek: oda101" />
-    </div>
-    <div class="field">
-      <label>İsmin</label>
-      <input type="text" id="nameInput" placeholder="İsmini yaz" />
-    </div>
-    <button class="btn-primary" id="joinBtn">Odaya Gir</button>
-    <div id="errorBox"></div>
-    <p class="note">Aynı oda kodunu kullanan herkes aynı sohbete girer.</p>
+  <!-- GİRİŞ -->
+  <div class="card" id="joinDiv">
+    <h1>MukoCan Chat</h1>
+    <input id="roomIn" type="text" placeholder="Oda kodu (örn: 44)" />
+    <input id="nameIn" type="text" placeholder="İsmin" />
+    <button onclick="gir()">Odaya Gir</button>
+    <div id="joinErr" class="error hidden"></div>
+    <div class="info">Aynı oda kodu = aynı sohbet</div>
   </div>
 
-  <div id="chatScreen">
-    <div class="chat-header">
-      <div class="chat-header-info">
-        <h2 id="headerRoom">Oda</h2>
-        <span><span class="status-dot" id="statusDot"></span><span id="statusText">Bağlanıyor...</span></span>
-      </div>
-      <button class="btn-leave" id="leaveBtn">Çık</button>
+  <!-- SOHBET -->
+  <div class="card hidden" id="chatDiv">
+    <h1 id="odaBaslik">Oda</h1>
+    <div class="status" id="durumYazi">Bağlanıyor...</div>
+    <div class="chat-box" id="mesajlar"></div>
+    <div id="chatErr" class="error hidden"></div>
+    <div class="row">
+      <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
+      <button onclick="gonder()" id="gonderBtn">Gönder</button>
     </div>
-    <div id="chatBox">
-      <div class="empty-state"><span>💬</span>Henüz mesaj yok. İlk sen yaz!</div>
-    </div>
-    <div class="chat-footer">
-      <input type="text" id="msgInput" placeholder="Mesaj yaz..." />
-      <button class="btn-send" id="sendBtn">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
-    </div>
+    <button class="leave-btn" onclick="cik()">Odadan Çık</button>
   </div>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://zxlbfzfccbdciqdmqmsy.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bGJmemZjY2JkY2lxZG1xbXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTg4NDUsImV4cCI6MjA4ODgzNDg0NX0.4QmR0PGik--bMaSL7LugNAgxZsyzgFOiuXxh8B8V9FM";
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const URL_  = "https://zxlbfzfccbdciqdmqmsy.supabase.co";
+const KEY_  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bGJmemZjY2JkY2lxZG1xbXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTg4NDUsImV4cCI6MjA4ODgzNDg0NX0.4QmR0PGik--bMaSL7LugNAgxZsyzgFOiuXxh8B8V9FM";
+const sb    = window.supabase.createClient(URL_, KEY_);
 
-  const joinScreen = document.getElementById("joinScreen");
-  const chatScreen = document.getElementById("chatScreen");
-  const roomInput  = document.getElementById("roomInput");
-  const nameInput  = document.getElementById("nameInput");
-  const joinBtn    = document.getElementById("joinBtn");
-  const leaveBtn   = document.getElementById("leaveBtn");
-  const chatBox    = document.getElementById("chatBox");
-  const msgInput   = document.getElementById("msgInput");
-  const sendBtn    = document.getElementById("sendBtn");
-  const headerRoom = document.getElementById("headerRoom");
-  const statusDot  = document.getElementById("statusDot");
-  const statusText = document.getElementById("statusText");
-  const errorBox   = document.getElementById("errorBox");
+let oda = "", isim = "", kanal = null;
 
-  let activeRoom = "", activeName = "", channel = null;
+function hata(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.remove("hidden");
+}
+function hataGizle(id) { document.getElementById(id).classList.add("hidden"); }
+function durum(msg) { document.getElementById("durumYazi").textContent = msg; }
 
-  function showError(msg) { errorBox.textContent = msg; errorBox.style.display = "block"; }
-  function hideError() { errorBox.style.display = "none"; }
-  function setStatus(text, live) {
-    statusText.textContent = text;
-    statusDot.className = "status-dot" + (live ? " live" : "");
+function safe(s) {
+  const d = document.createElement("div");
+  d.textContent = s; return d.innerHTML;
+}
+
+function mesajEkle(m) {
+  const box = document.getElementById("mesajlar");
+  const zaman = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
+  const div = document.createElement("div");
+  div.className = "msg";
+  div.innerHTML = '<div class="name">' + safe(m.name) + ' <span class="time">' + zaman + '</span></div><div class="text">' + safe(m.message) + '</div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function gir() {
+  const r = document.getElementById("roomIn").value.trim();
+  const n = document.getElementById("nameIn").value.trim();
+  if (!r || !n) { hata("joinErr", "Oda kodu ve isim zorunlu!"); return; }
+  hataGizle("joinErr");
+  oda = r; isim = n;
+
+  document.getElementById("joinDiv").classList.add("hidden");
+  document.getElementById("chatDiv").classList.remove("hidden");
+  document.getElementById("odaBaslik").textContent = "# " + oda;
+  durum("Yükleniyor...");
+
+  const { data, error } = await sb.from("messages").select("*").eq("room", oda).order("created_at", {ascending: true});
+  if (error) { durum(""); hata("chatErr", "Hata: " + error.message); return; }
+  (data || []).forEach(mesajEkle);
+  durum("Canlı bağlantı açık ✓");
+
+  if (kanal) sb.removeChannel(kanal);
+  kanal = sb.channel("oda-" + oda)
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "room=eq." + oda },
+      p => mesajEkle(p.new))
+    .subscribe(s => {
+      if (s === "SUBSCRIBED") durum("Canlı bağlantı açık ✓");
+    });
+
+  document.getElementById("mesajIn").focus();
+}
+
+async function gonder() {
+  const text = document.getElementById("mesajIn").value.trim();
+  if (!text) return;
+  hataGizle("chatErr");
+  document.getElementById("gonderBtn").disabled = true;
+  document.getElementById("mesajIn").value = "";
+
+  const { error } = await sb.from("messages").insert([{ room: oda, name: isim, message: text }]);
+  document.getElementById("gonderBtn").disabled = false;
+
+  if (error) {
+    document.getElementById("mesajIn").value = text;
+    hata("chatErr", "Gönderilemedi: " + error.message);
   }
-  function safe(str) {
-    const d = document.createElement("div");
-    d.textContent = str; return d.innerHTML;
+  document.getElementById("mesajIn").focus();
+}
+
+function cik() {
+  if (kanal) { sb.removeChannel(kanal); kanal = null; }
+  oda = ""; isim = "";
+  document.getElementById("mesajlar").innerHTML = "";
+  document.getElementById("chatDiv").classList.add("hidden");
+  document.getElementById("joinDiv").classList.remove("hidden");
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    if (!document.getElementById("chatDiv").classList.contains("hidden")) gonder();
+    else gir();
   }
-  function formatTime(dateStr) {
-    return new Date(dateStr).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-  }
-
-  function addMsg(msg) {
-    const empty = chatBox.querySelector(".empty-state");
-    if (empty) empty.remove();
-    const isMine = msg.name === activeName;
-    const div = document.createElement("div");
-    div.className = "msg" + (isMine ? " mine" : "");
-    div.innerHTML =
-      '<div class="msg-header">' +
-        '<span class="msg-name">' + safe(msg.name || "Adsız") + '</span>' +
-        '<span class="msg-time">' + formatTime(msg.created_at) + '</span>' +
-      '</div>' +
-      '<div class="msg-text">' + safe(msg.message || "") + '</div>';
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  async function joinRoom() {
-    const room = roomInput.value.trim();
-    const name = nameInput.value.trim();
-    if (!room || !name) { showError("Oda kodu ve isim girmek zorunlu!"); return; }
-    hideError();
-    activeRoom = room; activeName = name;
-    joinBtn.disabled = true; joinBtn.textContent = "Bağlanıyor...";
-    joinScreen.style.display = "none";
-    chatScreen.style.display = "flex";
-    headerRoom.textContent = "# " + room;
-    setStatus("Yükleniyor...", false);
-
-    const { data, error } = await db.from("messages").select("*")
-      .eq("room", room).order("created_at", { ascending: true });
-
-    if (error) { setStatus("Hata: " + error.message, false); }
-    else { (data || []).forEach(addMsg); setStatus("Canlı bağlantı açık.", true); }
-
-    joinBtn.disabled = false; joinBtn.textContent = "Odaya Gir";
-    subscribeRealtime(room);
-    msgInput.focus();
-    localStorage.setItem("mc_room", room);
-    localStorage.setItem("mc_name", name);
-  }
-
-  function subscribeRealtime(room) {
-    if (channel) { db.removeChannel(channel); }
-    channel = db.channel("room:" + room)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "room=eq." + room },
-        (payload) => addMsg(payload.new))
-      .subscribe((s) => {
-        if (s === "SUBSCRIBED") setStatus("Canlı bağlantı açık.", true);
-        if (s === "CLOSED") setStatus("Bağlantı kesildi.", false);
-      });
-  }
-
-  async function sendMessage() {
-    const text = msgInput.value.trim();
-    if (!text) return;
-    sendBtn.disabled = true;
-    msgInput.value = "";
-    const { error } = await db.from("messages").insert([{ room: activeRoom, name: activeName, message: text }]);
-    sendBtn.disabled = false;
-    if (error) { msgInput.value = text; showError("Gönderilemedi: " + error.message); }
-    msgInput.focus();
-  }
-
-  function leaveRoom() {
-    if (channel) { db.removeChannel(channel); channel = null; }
-    chatBox.innerHTML = '<div class="empty-state"><span>💬</span>Henüz mesaj yok. İlk sen yaz!</div>';
-    chatScreen.style.display = "none";
-    joinScreen.style.display = "block";
-    activeRoom = ""; activeName = "";
-  }
-
-  joinBtn.addEventListener("click", joinRoom);
-  leaveBtn.addEventListener("click", leaveRoom);
-  sendBtn.addEventListener("click", sendMessage);
-  msgInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendMessage(); });
-  roomInput.addEventListener("keydown", (e) => { if (e.key === "Enter") nameInput.focus(); });
-  nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") joinRoom(); });
-
-  const sr = localStorage.getItem("mc_room");
-  const sn = localStorage.getItem("mc_name");
-  if (sr) roomInput.value = sr;
-  if (sn) nameInput.value = sn;
+});
 </script>
 </body>
 </html>
