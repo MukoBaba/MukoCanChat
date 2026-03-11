@@ -21,16 +21,16 @@
     .status { color: #7dffbc; font-size: 13px; text-align: center; margin: 5px 0; }
     .error { color: #ff6b6b; font-size: 13px; text-align: center; margin: 5px 0; background: rgba(255,0,0,0.1); padding: 8px; border-radius: 8px; }
     .row { display: flex; gap: 8px; }
-    .row input { flex: 1; }
-    .row button { width: auto; padding: 12px 20px; margin-top: 10px; }
+    .row input { flex: 1; margin-top: 0; }
+    .row button { width: auto; padding: 12px 20px; margin-top: 0; }
     .leave-btn { background: #3d1a7a; margin-top: 8px; }
-    .info { color: #aa98d9; font-size: 13px; text-align: center; margin-top: 5px; }
+    .info { color: #aa98d9; font-size: 13px; text-align: center; margin-top: 8px; }
+    .input-wrap { margin-top: 10px; }
   </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- GİRİŞ -->
   <div class="card" id="joinDiv">
     <h1>MukoCan Chat</h1>
     <input id="roomIn" type="text" placeholder="Oda kodu (örn: 44)" />
@@ -40,50 +40,55 @@
     <div class="info">Aynı oda kodu = aynı sohbet</div>
   </div>
 
-  <!-- SOHBET -->
   <div class="card hidden" id="chatDiv">
     <h1 id="odaBaslik">Oda</h1>
     <div class="status" id="durumYazi">Bağlanıyor...</div>
     <div class="chat-box" id="mesajlar"></div>
     <div id="chatErr" class="error hidden"></div>
-    <div class="row">
-      <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
-      <button onclick="gonder()" id="gonderBtn">Gönder</button>
+    <div class="input-wrap">
+      <div class="row">
+        <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
+        <button onclick="gonder()" id="gonderBtn">Gönder</button>
+      </div>
+      <button class="leave-btn" onclick="cik()">Odadan Çık</button>
     </div>
-    <button class="leave-btn" onclick="cik()">Odadan Çık</button>
   </div>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const URL_  = "https://zxlbfzfccbdciqdmqmsy.supabase.co";
-const KEY_  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bGJmemZjY2JkY2lxZG1xbXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTg4NDUsImV4cCI6MjA4ODgzNDg0NX0.4QmR0PGik--bMaSL7LugNAgxZsyzgFOiuXxh8B8V9FM";
-const sb    = window.supabase.createClient(URL_, KEY_);
+const URL_ = "https://zxlbfzfccbdciqdmqmsy.supabase.co";
+const KEY_ = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bGJmemZjY2JkY2lxZG1xbXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTg4NDUsImV4cCI6MjA4ODgzNDg0NX0.4QmR0PGik--bMaSL7LugNAgxZsyzgFOiuXxh8B8V9FM";
+const sb = window.supabase.createClient(URL_, KEY_);
 
-let oda = "", isim = "", kanal = null;
+let oda = "", isim = "", timer = null, sonMesajId = null;
 
-function hata(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.classList.remove("hidden");
-}
-function hataGizle(id) { document.getElementById(id).classList.add("hidden"); }
+function safe(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 function durum(msg) { document.getElementById("durumYazi").textContent = msg; }
-
-function safe(s) {
-  const d = document.createElement("div");
-  d.textContent = s; return d.innerHTML;
-}
+function hata(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.classList.remove("hidden"); }
+function hataGizle(id) { document.getElementById(id).classList.add("hidden"); }
 
 function mesajEkle(m) {
   const box = document.getElementById("mesajlar");
   const zaman = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
   const div = document.createElement("div");
   div.className = "msg";
+  div.dataset.id = m.id;
   div.innerHTML = '<div class="name">' + safe(m.name) + ' <span class="time">' + zaman + '</span></div><div class="text">' + safe(m.message) + '</div>';
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
+}
+
+async function mesajlariYukle() {
+  const { data, error } = await sb.from("messages").select("*").eq("room", oda).order("created_at", {ascending: true});
+  if (error) { durum("Hata: " + error.message); return; }
+  const box = document.getElementById("mesajlar");
+  const mevcutIdler = Array.from(box.querySelectorAll(".msg")).map(el => el.dataset.id);
+  (data || []).forEach(m => {
+    if (!mevcutIdler.includes(String(m.id))) mesajEkle(m);
+  });
+  durum("✓ Aktif — her 3sn yenileniyor");
 }
 
 async function gir() {
@@ -92,25 +97,12 @@ async function gir() {
   if (!r || !n) { hata("joinErr", "Oda kodu ve isim zorunlu!"); return; }
   hataGizle("joinErr");
   oda = r; isim = n;
-
   document.getElementById("joinDiv").classList.add("hidden");
   document.getElementById("chatDiv").classList.remove("hidden");
   document.getElementById("odaBaslik").textContent = "# " + oda;
   durum("Yükleniyor...");
-
-  const { data, error } = await sb.from("messages").select("*").eq("room", oda).order("created_at", {ascending: true});
-  if (error) { durum(""); hata("chatErr", "Hata: " + error.message); return; }
-  (data || []).forEach(mesajEkle);
-  durum("Canlı bağlantı açık ✓");
-
-  if (kanal) sb.removeChannel(kanal);
-  kanal = sb.channel("oda-" + oda)
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "room=eq." + oda },
-      p => mesajEkle(p.new))
-    .subscribe(s => {
-      if (s === "SUBSCRIBED") durum("Canlı bağlantı açık ✓");
-    });
-
+  await mesajlariYukle();
+  timer = setInterval(mesajlariYukle, 3000);
   document.getElementById("mesajIn").focus();
 }
 
@@ -120,19 +112,15 @@ async function gonder() {
   hataGizle("chatErr");
   document.getElementById("gonderBtn").disabled = true;
   document.getElementById("mesajIn").value = "";
-
   const { error } = await sb.from("messages").insert([{ room: oda, name: isim, message: text }]);
   document.getElementById("gonderBtn").disabled = false;
-
-  if (error) {
-    document.getElementById("mesajIn").value = text;
-    hata("chatErr", "Gönderilemedi: " + error.message);
-  }
+  if (error) { document.getElementById("mesajIn").value = text; hata("chatErr", "Gönderilemedi: " + error.message); }
+  else { await mesajlariYukle(); }
   document.getElementById("mesajIn").focus();
 }
 
 function cik() {
-  if (kanal) { sb.removeChannel(kanal); kanal = null; }
+  clearInterval(timer); timer = null;
   oda = ""; isim = "";
   document.getElementById("mesajlar").innerHTML = "";
   document.getElementById("chatDiv").classList.add("hidden");
