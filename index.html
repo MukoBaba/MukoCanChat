@@ -137,16 +137,27 @@
         <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
         <button onclick="gonder()" id="gonderBtn" style="width:auto;padding:12px 18px;margin-top:0">Gönder</button>
       </div>
-      <div class="yonetici-kutu" id="yoneticiPanel" style="display:none">
-        ⭐ Sen bu odanın yöneticisisin
-        <button class="btn-red" style="margin-top:8px;font-size:13px;padding:10px" onclick="odaSil()">🗑️ Odayı Sil</button>
-      </div>
-      <div id="yoneticiGiris" style="margin-top:10px">
-        <div style="display:flex;gap:8px">
-          <input id="yoneticiKeyGir" type="password" placeholder="Yönetici anahtarı" style="margin-top:0;font-size:13px" />
-          <button onclick="yoneticiDogrula()" style="width:auto;padding:10px 14px;margin-top:0;font-size:13px;background:#3d1a7a">Doğrula</button>
+      <!-- ALT ÇIKINTI -->
+      <div style="text-align:center;margin-top:6px">
+        <div onclick="panelToggle()" style="display:inline-block;background:#1f0d3d;border:1px solid #3d216d;border-radius:0 0 12px 12px;padding:4px 24px;cursor:pointer;font-size:12px;color:#aa98d9;">
+          ⚙️ Yönetici
         </div>
-        <div class="error" id="yoneticiErr"></div>
+      </div>
+
+      <!-- YÖNETİCİ PANELİ -->
+      <div id="yoneticiPanel" style="display:none;background:#1a0b33;border:1px solid #3d216d;border-radius:12px;padding:16px;margin-top:4px;">
+        <div id="yoneticiGiris">
+          <div style="font-size:13px;color:#aa98d9;margin-bottom:8px;">Yönetici anahtarını gir:</div>
+          <div style="display:flex;gap:8px;">
+            <input id="yoneticiKeyGir" type="password" placeholder="Anahtar" style="margin-top:0;font-size:13px;" />
+            <button onclick="yoneticiDogrula()" style="width:auto;padding:10px 14px;margin-top:0;font-size:13px;background:#3d1a7a;">Doğrula</button>
+          </div>
+          <div class="error" id="yoneticiErr"></div>
+        </div>
+        <div id="yoneticiOnaylandi" style="display:none;">
+          <div style="color:#7dffbc;font-size:13px;margin-bottom:10px;">⭐ Yönetici olarak doğrulandın</div>
+          <button class="btn-red" style="font-size:13px;padding:10px;" onclick="odaSil()">🗑️ Odayı Sil</button>
+        </div>
       </div>
     </div>
   </div>
@@ -322,12 +333,19 @@ async function gonder() {
   document.getElementById("mesajIn").focus();
 }
 
+function panelToggle() {
+  const p = document.getElementById("yoneticiPanel");
+  p.style.display = p.style.display === "none" ? "block" : "none";
+}
+
 async function yoneticiDogrula() {
   const key = document.getElementById("yoneticiKeyGir").value.trim();
   if (!key) return;
   const { data } = await sb.from("rooms").select("owner_key").eq("id", aktifOda.id).single();
   if (data && data.owner_key === key) {
-    yoneticiMi = true; gizle("yoneticiGiris"); goster("yoneticiPanel");
+    yoneticiMi = true;
+    document.getElementById("yoneticiGiris").style.display = "none";
+    document.getElementById("yoneticiOnaylandi").style.display = "block";
   } else { hata("yoneticiErr", "Yanlış anahtar!"); }
 }
 
