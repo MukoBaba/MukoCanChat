@@ -441,7 +441,7 @@
       <input id="kayitSifre" type="password" placeholder="Şifren" />
       <span class="label">Şifreyi tekrarla</span>
       <input id="kayitSifre2" type="password" placeholder="Şifreni tekrar yaz" />
-      <button class="btn" onclick="kayitOl()">Kayıt Ol</button>
+      <button class="btn" style="position:relative;z-index:999" onclick="alert('test');kayitOl()">Kayıt Ol</button>
       <div class="err" id="kayitErr"></div>
     </div>
     <!-- OTP Doğrulama -->
@@ -728,7 +728,7 @@
   </div>
 </div>
 
-<div class="ver">v6.6</div>
+<div class="ver">v6.7</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
