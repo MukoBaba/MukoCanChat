@@ -78,23 +78,31 @@
     .durum-dot.ok { background: #34d399; box-shadow: 0 0 6px #34d399; }
     .duyuru-bar { background: rgba(124,58,237,0.08); border-bottom: 1px solid #2a1a48; padding: 7px 16px; text-align: center; font-size: 12px; color: #fbbf24; flex-shrink: 0; display: none; font-weight: 500; letter-spacing: 0.2px; }
 
-    .mesajlar { flex: 1; overflow-y: auto; padding: 8px 16px; display: flex; flex-direction: column; gap: 2px; }
-    .msg { border-radius: 10px; padding: 4px 10px; max-width: 78%; user-select: none; }
-    .msg.diger { background: #12101e; border: 1px solid #1e1a32; border-bottom-left-radius: 3px; align-self: flex-start; }
-    .msg.benim { background: linear-gradient(135deg, #2e0b5e, #3b0f75); border-bottom-right-radius: 3px; align-self: flex-end; margin-left: auto; }
-    .msg.iletiliyor { opacity: 0.6; transform: scale(0.97); transition: all 0.15s; }
-    .msg-isim { font-size: 10px; font-weight: 600; color: #7c3aed; margin-bottom: 1px; }
-    .msg.benim .msg-isim { color: #fbbf24; }
-    .msg-icerik { font-size: 13px; color: #e8e0f0; line-height: 1.35; word-break: break-word; }
-    .msg-alt { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
-    .msg-saat { font-size: 10px; color: #2e2548; }
-    .msg.benim .msg-saat { color: #5a3a8a; }
-    .msg-aksiyonlar { display: flex; gap: 4px; }
+    .mesajlar { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 1px; }
+    /* Mesaj grubu — aynı kişinin ardışık mesajları */
+    .msg-wrap { display: flex; flex-direction: column; margin-bottom: 6px; }
+    .msg-wrap.benim { align-items: flex-end; }
+    .msg-wrap.diger { align-items: flex-start; }
+    .msg-grup-isim { font-size: 11px; font-weight: 600; color: #7c3aed; margin-bottom: 3px; padding-left: 4px; }
+    .msg-wrap.benim .msg-grup-isim { color: #fbbf24; text-align: right; padding-right: 4px; padding-left: 0; }
+    .msg { border-radius: 18px; padding: 7px 12px; max-width: 72%; position: relative; word-break: break-word; }
+    .msg.diger { background: #1a1628; border-bottom-left-radius: 4px; }
+    .msg.benim { background: #3b0f75; border-bottom-right-radius: 4px; }
+    .msg + .msg { margin-top: 2px; border-radius: 18px; }
+    .msg.diger:not(:last-child) { border-bottom-left-radius: 18px; }
+    .msg.benim:not(:last-child) { border-bottom-right-radius: 18px; }
+    .msg.iletiliyor { opacity: 0.5; }
+    .msg-icerik { font-size: 14px; color: #e8e0f0; line-height: 1.4; }
+    .msg-alt { display: flex; align-items: center; gap: 6px; margin-top: 2px; justify-content: flex-end; }
+    .msg-saat { font-size: 10px; color: #3d2d5a; }
+    .msg.benim .msg-saat { color: #6040a0; }
+    .msg-aksiyonlar { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }
+    .msg:hover .msg-aksiyonlar { opacity: 1; }
     .alinti-btn { font-size: 11px; color: #2a1e42; cursor: pointer; padding: 1px 5px; border-radius: 5px; transition: all 0.15s; }
     .alinti-btn:hover { color: #a78bfa; background: rgba(124,58,237,0.12); }
     .ilet-btn { font-size: 11px; color: #2a1e42; cursor: pointer; padding: 1px 5px; border-radius: 5px; transition: all 0.15s; }
     .ilet-btn:hover { color: #34d399; background: rgba(52,211,153,0.1); }
-    .alinti-blok { background: rgba(0,0,0,0.3); border-left: 2px solid #6d28d9; border-radius: 6px; padding: 4px 8px; font-size: 11px; color: #4a3a6a; margin-bottom: 4px; line-height: 1.4; }
+    .alinti-blok { background: rgba(0,0,0,0.25); border-left: 2px solid #7c3aed; border-radius: 6px; padding: 3px 8px; font-size: 11px; color: #5a4a7a; margin-bottom: 4px; line-height: 1.35; }
     /* İletme popup */
     .ilet-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #12101e; border: 1px solid #1e1a32; border-radius: 16px; padding: 14px 18px; z-index: 150; display: none; box-shadow: 0 8px 32px rgba(0,0,0,0.5); min-width: 260px; }
     .ilet-popup-baslik { font-size: 12px; color: #4a3a6a; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -469,21 +477,48 @@ async function mesajlariYukle() {
   const box = el("mesajlar");
   const mevcutlar = Array.from(box.querySelectorAll(".msg")).map(e => e.dataset.id);
   const scrollBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
-  (data||[]).forEach(m => {
+  (data||[]).forEach((m, i) => {
     if (!mevcutlar.includes(String(m.id))) {
+      const benimMi = m.name === aktifIsim;
+      const oncekiMesaj = data[i-1];
+      const sonrakiMesaj = data[i+1];
+      const grupBaslangic = !oncekiMesaj || oncekiMesaj.name !== m.name;
+      const grupSonu = !sonrakiMesaj || sonrakiMesaj.name !== m.name;
+
+      // Grup başlangıcında wrapper oluştur
+      let wrap;
+      if (grupBaslangic) {
+        wrap = document.createElement("div");
+        wrap.className = "msg-wrap " + (benimMi ? "benim" : "diger");
+        wrap.dataset.grup = m.name;
+        if (!benimMi) {
+          const isimDiv = document.createElement("div");
+          isimDiv.className = "msg-grup-isim";
+          isimDiv.textContent = m.name;
+          wrap.appendChild(isimDiv);
+        }
+        box.appendChild(wrap);
+      } else {
+        // Son wrap'i bul
+        const wraps = box.querySelectorAll(".msg-wrap");
+        wrap = wraps[wraps.length - 1];
+      }
+
       const div = document.createElement("div");
-      div.className = "msg " + (m.name === aktifIsim ? "benim" : "diger");
+      div.className = "msg " + (benimMi ? "benim" : "diger");
       div.dataset.id = m.id; div.dataset.isim = m.name; div.dataset.mesaj = m.message;
       const saat = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit",minute:"2-digit"});
       const alintiBlok = m.reply_to ? `<div class="alinti-blok">↩ ${safe(m.reply_to)}</div>` : "";
-      div.innerHTML = `<div class="msg-isim">${safe(m.name)}</div>${alintiBlok}<div class="msg-icerik">${safe(m.message)}</div><div class="msg-alt"><span class="msg-saat">${saat}</span><div class="msg-aksiyonlar"><span class="alinti-btn" onclick="alintiYap(this)">↩</span><span class="ilet-btn" onclick="iletAc(this)">↗</span></div></div>`;
+      const saatVeBtn = grupSonu ? `<div class="msg-alt"><span class="msg-saat">${saat}</span><div class="msg-aksiyonlar"><span class="alinti-btn" onclick="alintiYap(this)">↩</span><span class="ilet-btn" onclick="iletAc(this)">↗</span></div></div>` : "";
+      div.innerHTML = `${alintiBlok}<div class="msg-icerik">${safe(m.message)}</div>${saatVeBtn}`;
+
       // Çift tıklama ile ilet
       let tapTimer = null;
       div.addEventListener("click", () => {
-        if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; iletAc(div.querySelector(".ilet-btn")); }
+        if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; iletAc(div); }
         else { tapTimer = setTimeout(() => { tapTimer = null; }, 300); }
       });
-      box.appendChild(div);
+      wrap.appendChild(div);
       if (sonMesajId !== null && m.name !== aktifIsim) bildirimGonder(m.name, m.message);
     }
   });
@@ -495,8 +530,8 @@ async function mesajlariYukle() {
 
 // İLETME
 let iletMsg = null;
-function iletAc(btn) {
-  const m = btn.closest(".msg");
+function iletAc(el_) {
+  const m = el_.classList.contains("msg") ? el_ : el_.closest(".msg");
   iletMsg = { isim: m.dataset.isim, metin: m.dataset.mesaj };
   el("iletMesajOnizleme").textContent = iletMsg.isim + ": " + iletMsg.metin;
   el("iletPopup").style.display = "block";
@@ -615,5 +650,6 @@ document.addEventListener("keydown", e => {
 
 odalariYukle();
 </script>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#1e1a32;z-index:1;pointer-events:none">v0.2</div>
 </body>
 </html>
