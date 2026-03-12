@@ -668,7 +668,7 @@
     </div>
     <div class="kilitli-bilgi" id="kilitliBilgi">🔇 Sadece yönetici yazabilir</div>
 
-    <div class="yonetici-panel" id="yoneticiPanel" onclick="panelDışıKapat(event)">
+    <div class="yonetici-panel" id="yoneticiPanel" onclick="panelDisiKapat(event)">
     <div class="yonetici-panel-icerik">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:14px;font-weight:700;color:#e8e0f0">⚙️ Yönetici Paneli</div><span onclick="panelKapat()" style="cursor:pointer;color:#3d2d5a;font-size:20px">✕</span></div>
       <div id="yGiris">
@@ -728,7 +728,7 @@
   </div>
 </div>
 
-<div class="ver">v6.3</div>
+<div class="ver">v6.4</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1200,7 +1200,7 @@ async function duyuruToggle(){
 
 // YÖNETİCİ
 function panelKapat(){ el("yoneticiPanel").style.display="none"; }
-function panelDışıKapat(e){ if(e.target===el("yoneticiPanel")) panelKapat(); }
+function panelDisiKapat(e){ if(e.target===el("yoneticiPanel")) panelKapat(); }
 function panelToggle(){
   const p=el("yoneticiPanel");
   p.style.display=p.style.display==="block"?"none":"block";
@@ -1598,6 +1598,7 @@ async function girisYap(){
 }
 
 async function kayitOl(){
+  try{
   const ad = el("kayitAd").value.trim();
   const email = el("kayitEmail").value.trim().toLowerCase();
   const s1 = el("kayitSifre").value;
@@ -1631,6 +1632,7 @@ async function kayitOl(){
   bekleyenEmail = email;
   bekleyenKayit = {id:authData.user.id, username:ad, email, created_at:data.created_at};
   authTab("otp");
+  }catch(err){ el("kayitErr").textContent="HATA: "+err.message; console.error(err); }
 }
 
 async function hesapCikis(){
