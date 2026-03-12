@@ -6,51 +6,125 @@
   <title>MukoCan Chat</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #0f0620; color: #fff; }
+    body { font-family: Arial, sans-serif; background: #0f0620; color: #fff; min-height: 100vh; }
     .wrap { max-width: 500px; margin: 0 auto; padding: 16px; }
+    h1 { color: #ffd54a; text-align: center; margin-bottom: 4px; font-size: 26px; }
+    .subtitle { color: #aa98d9; text-align: center; font-size: 13px; margin-bottom: 20px; }
     .card { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    h1 { color: #ffd54a; text-align: center; margin-bottom: 16px; font-size: 24px; }
-    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #53308b; background: #120824; color: #fff; margin-top: 10px; font-size: 16px; }
-    button { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #6a2cff; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    .chat-box { height: 400px; overflow-y: auto; background: #120824; border: 1px solid #53308b; border-radius: 10px; padding: 10px; margin: 10px 0; }
-    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
-    .msg .name { color: #ffd54a; font-size: 13px; font-weight: bold; }
-    .msg .text { color: #fff; font-size: 15px; margin-top: 3px; }
-    .msg .time { color: #aa98d9; font-size: 11px; }
+    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #53308b; background: #120824; color: #fff; margin-top: 10px; font-size: 16px; outline: none; }
+    input:focus { border-color: #8c52ff; }
+    button { width: 100%; padding: 13px; border-radius: 10px; border: none; background: #6a2cff; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:hover { opacity: 0.9; }
+    .btn-red { background: #7a1a1a; }
+    .btn-gray { background: #3d1a7a; }
     .hidden { display: none; }
+    .error { color: #ff6b6b; font-size: 13px; background: rgba(255,0,0,0.1); padding: 8px; border-radius: 8px; margin-top: 8px; }
     .status { color: #7dffbc; font-size: 13px; text-align: center; margin: 5px 0; }
-    .error { color: #ff6b6b; font-size: 13px; text-align: center; margin: 5px 0; background: rgba(255,0,0,0.1); padding: 8px; border-radius: 8px; }
-    .row { display: flex; gap: 8px; }
+
+    /* ODA LİSTESİ */
+    .section-title { color: #ffd54a; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
+    .oda-item {
+      background: #120824; border: 1px solid #3d216d; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+    .oda-item:hover { border-color: #8c52ff; }
+    .oda-item .oda-adi { font-size: 16px; font-weight: bold; color: #fff; }
+    .oda-item .oda-info { font-size: 12px; color: #aa98d9; margin-top: 3px; }
+    .oda-item .kilit { font-size: 18px; }
+    .oda-bos { color: #aa98d9; font-size: 14px; text-align: center; padding: 20px; }
+
+    /* ODA OLUŞTUR */
+    .yeni-btn { background: #1f0d3d; border: 1px dashed #53308b; border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; color: #aa98d9; font-size: 14px; margin-bottom: 16px; }
+    .yeni-btn:hover { border-color: #8c52ff; color: #fff; }
+
+    /* SOHBET */
+    .chat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .chat-header h2 { color: #ffd54a; font-size: 18px; }
+    .chat-box { height: 380px; overflow-y: auto; background: #120824; border: 1px solid #53308b; border-radius: 10px; padding: 10px; margin: 10px 0; }
+    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+    .msg.benim { border-left-color: #ffd54a; background: #1f1000; }
+    .msg .isim { color: #ffd54a; font-size: 12px; font-weight: bold; }
+    .msg.benim .isim { color: #ffb300; }
+    .msg .icerik { color: #fff; font-size: 15px; margin-top: 2px; }
+    .msg .saat { color: #aa98d9; font-size: 11px; }
+    .row { display: flex; gap: 8px; margin-top: 10px; }
     .row input { flex: 1; margin-top: 0; }
-    .row button { width: auto; padding: 12px 20px; margin-top: 0; }
-    .leave-btn { background: #3d1a7a; margin-top: 8px; }
-    .info { color: #aa98d9; font-size: 13px; text-align: center; margin-top: 8px; }
-    .input-wrap { margin-top: 10px; }
+    .row button { width: auto; padding: 12px 18px; margin-top: 0; flex-shrink: 0; }
   </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="card" id="joinDiv">
-    <h1>MukoCan Chat</h1>
-    <input id="roomIn" type="text" placeholder="Oda kodu (örn: 44)" />
-    <input id="nameIn" type="text" placeholder="İsmin" />
-    <button onclick="gir()">Odaya Gir</button>
-    <div id="joinErr" class="error hidden"></div>
-    <div class="info">Aynı oda kodu = aynı sohbet</div>
+  <!-- ANA EKRAN: ODA LİSTESİ -->
+  <div id="anaSayfa">
+    <div style="padding-top:16px">
+      <h1>MukoCan Chat</h1>
+      <div class="subtitle">Bir odaya gir veya yeni oda oluştur</div>
+    </div>
+
+    <div class="yeni-btn" onclick="yeniOdaGoster()">+ Yeni Oda Oluştur</div>
+
+    <!-- YENİ ODA FORMU -->
+    <div class="card hidden" id="yeniOdaForm">
+      <div class="section-title">Yeni Oda Oluştur</div>
+      <input id="yeniAd" type="text" placeholder="Oda adı" />
+      <input id="yeniSifre" type="password" placeholder="Şifre (opsiyonel)" />
+      <input id="yeniIsim" type="text" placeholder="Takma ismin" />
+      <button onclick="odaOlustur()">Odayı Oluştur ve Gir</button>
+      <button class="btn-gray" onclick="yeniOdaGizle()">İptal</button>
+      <div id="yeniErr" class="error hidden"></div>
+    </div>
+
+    <!-- ODA LİSTESİ -->
+    <div class="card">
+      <div class="section-title">Odalar</div>
+      <div id="odaListesi"><div class="oda-bos">Yükleniyor...</div></div>
+    </div>
   </div>
 
-  <div class="card hidden" id="chatDiv">
-    <h1 id="odaBaslik">Oda</h1>
-    <div class="status" id="durumYazi">Bağlanıyor...</div>
-    <div class="chat-box" id="mesajlar"></div>
-    <div id="chatErr" class="error hidden"></div>
-    <div class="input-wrap">
+  <!-- ŞİFRE EKRANI -->
+  <div id="sifreSayfasi" class="hidden">
+    <div class="card" style="margin-top:40px">
+      <h1 id="sifreOdaAdi">Oda</h1>
+      <div class="subtitle">Bu oda şifreli</div>
+      <input id="sifreGir" type="password" placeholder="Şifreyi gir" />
+      <input id="sifreIsim" type="text" placeholder="Takma ismin" />
+      <button onclick="sifreDogrula()">Gir</button>
+      <button class="btn-gray" onclick="anaSayfayaDon()">Geri</button>
+      <div id="sifreErr" class="error hidden"></div>
+    </div>
+  </div>
+
+  <!-- İSİM EKRANI (şifresiz oda) -->
+  <div id="isimSayfasi" class="hidden">
+    <div class="card" style="margin-top:40px">
+      <h1 id="isimOdaAdi">Oda</h1>
+      <input id="isimGir" type="text" placeholder="Takma ismin" />
+      <button onclick="isimleGir()">Odaya Gir</button>
+      <button class="btn-gray" onclick="anaSayfayaDon()">Geri</button>
+      <div id="isimErr" class="error hidden"></div>
+    </div>
+  </div>
+
+  <!-- SOHBET EKRANI -->
+  <div id="chatSayfasi" class="hidden">
+    <div class="card" style="padding-bottom:10px">
+      <div class="chat-header">
+        <h2 id="chatOdaAdi">Oda</h2>
+        <div style="display:flex;gap:8px">
+          <span id="chatIsimGoster" style="color:#aa98d9;font-size:13px;align-self:center"></span>
+          <button onclick="cik()" style="width:auto;padding:8px 14px;margin-top:0;background:#3d1a7a;font-size:13px">Çık</button>
+        </div>
+      </div>
+      <div class="status" id="durumYazi">Bağlanıyor...</div>
+      <div class="chat-box" id="mesajlar"></div>
+      <div id="chatErr" class="error hidden"></div>
       <div class="row">
         <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
-        <button onclick="gonder()" id="gonderBtn">Gönder</button>
+        <button onclick="gonder()" id="gonderBtn" style="width:auto;padding:12px 18px;margin-top:0">Gönder</button>
       </div>
-      <button class="leave-btn" onclick="cik()">Odadan Çık</button>
     </div>
   </div>
 
@@ -62,77 +136,170 @@ const URL_ = "https://zxlbfzfccbdciqdmqmsy.supabase.co";
 const KEY_ = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bGJmemZjY2JkY2lxZG1xbXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTg4NDUsImV4cCI6MjA4ODgzNDg0NX0.4QmR0PGik--bMaSL7LugNAgxZsyzgFOiuXxh8B8V9FM";
 const sb = window.supabase.createClient(URL_, KEY_);
 
-let oda = "", isim = "", timer = null, sonMesajId = null;
+let aktifOda = null, aktifIsim = "", timer = null;
 
 function safe(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
-function durum(msg) { document.getElementById("durumYazi").textContent = msg; }
+function goster(id) { document.getElementById(id).classList.remove("hidden"); }
+function gizle(id) { document.getElementById(id).classList.add("hidden"); }
 function hata(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.classList.remove("hidden"); }
 function hataGizle(id) { document.getElementById(id).classList.add("hidden"); }
+function durum(msg) { document.getElementById("durumYazi").textContent = msg; }
 
-function mesajEkle(m) {
-  const box = document.getElementById("mesajlar");
-  const zaman = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
-  const div = document.createElement("div");
-  div.className = "msg";
-  div.dataset.id = m.id;
-  div.innerHTML = '<div class="name">' + safe(m.name) + ' <span class="time">' + zaman + '</span></div><div class="text">' + safe(m.message) + '</div>';
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
-
-async function mesajlariYukle() {
-  const { data, error } = await sb.from("messages").select("*").eq("room", oda).order("created_at", {ascending: true});
-  if (error) { durum("Hata: " + error.message); return; }
-  const box = document.getElementById("mesajlar");
-  const mevcutIdler = Array.from(box.querySelectorAll(".msg")).map(el => el.dataset.id);
-  (data || []).forEach(m => {
-    if (!mevcutIdler.includes(String(m.id))) mesajEkle(m);
+// ── ODA LİSTESİ ──
+async function odalariYukle() {
+  const { data, error } = await sb.from("rooms").select("*").order("created_at", {ascending: false});
+  const liste = document.getElementById("odaListesi");
+  if (error || !data || data.length === 0) {
+    liste.innerHTML = '<div class="oda-bos">Henüz oda yok. İlk odayı sen oluştur!</div>';
+    return;
+  }
+  liste.innerHTML = "";
+  data.forEach(oda => {
+    const div = document.createElement("div");
+    div.className = "oda-item";
+    div.innerHTML = `
+      <div>
+        <div class="oda-adi">${safe(oda.name)}</div>
+        <div class="oda-info">${oda.password ? "🔒 Şifreli" : "🔓 Açık"}</div>
+      </div>
+      <div class="kilit">${oda.password ? "🔑" : "➡️"}</div>
+    `;
+    div.onclick = () => odayaTikla(oda);
+    liste.appendChild(div);
   });
-  durum("✓ Aktif — her 3sn yenileniyor");
 }
 
-async function gir() {
-  const r = document.getElementById("roomIn").value.trim();
-  const n = document.getElementById("nameIn").value.trim();
-  if (!r || !n) { hata("joinErr", "Oda kodu ve isim zorunlu!"); return; }
-  hataGizle("joinErr");
-  oda = r; isim = n;
-  document.getElementById("joinDiv").classList.add("hidden");
-  document.getElementById("chatDiv").classList.remove("hidden");
-  document.getElementById("odaBaslik").textContent = "# " + oda;
+// ── ODA TIKLAMA ──
+function odayaTikla(oda) {
+  aktifOda = oda;
+  if (oda.password) {
+    document.getElementById("sifreOdaAdi").textContent = "# " + oda.name;
+    document.getElementById("sifreGir").value = "";
+    document.getElementById("sifreIsim").value = "";
+    hataGizle("sifreErr");
+    gizle("anaSayfa");
+    goster("sifreSayfasi");
+  } else {
+    document.getElementById("isimOdaAdi").textContent = "# " + oda.name;
+    document.getElementById("isimGir").value = "";
+    hataGizle("isimErr");
+    gizle("anaSayfa");
+    goster("isimSayfasi");
+  }
+}
+
+// ── ŞİFRE DOĞRULA ──
+function sifreDogrula() {
+  const sifre = document.getElementById("sifreGir").value.trim();
+  const isim = document.getElementById("sifreIsim").value.trim();
+  if (!isim) { hata("sifreErr", "Takma isim gir!"); return; }
+  if (sifre !== aktifOda.password) { hata("sifreErr", "Şifre yanlış!"); return; }
+  aktifIsim = isim;
+  sohbeteGir();
+}
+
+// ── İSİMLE GİR ──
+function isimleGir() {
+  const isim = document.getElementById("isimGir").value.trim();
+  if (!isim) { hata("isimErr", "Takma isim gir!"); return; }
+  aktifIsim = isim;
+  sohbeteGir();
+}
+
+// ── SOHBETE GİR ──
+async function sohbeteGir() {
+  gizle("sifreSayfasi");
+  gizle("isimSayfasi");
+  goster("chatSayfasi");
+  document.getElementById("chatOdaAdi").textContent = "# " + aktifOda.name;
+  document.getElementById("chatIsimGoster").textContent = aktifIsim;
+  document.getElementById("mesajlar").innerHTML = "";
   durum("Yükleniyor...");
   await mesajlariYukle();
   timer = setInterval(mesajlariYukle, 3000);
   document.getElementById("mesajIn").focus();
 }
 
+// ── MESAJ YÜKLE ──
+async function mesajlariYukle() {
+  const { data, error } = await sb.from("messages").select("*").eq("room", aktifOda.id).order("created_at", {ascending: true});
+  if (error) { durum("Hata!"); return; }
+  const box = document.getElementById("mesajlar");
+  const mevcutlar = Array.from(box.querySelectorAll(".msg")).map(e => e.dataset.id);
+  (data || []).forEach(m => {
+    if (!mevcutlar.includes(String(m.id))) {
+      const div = document.createElement("div");
+      div.className = "msg" + (m.name === aktifIsim ? " benim" : "");
+      div.dataset.id = m.id;
+      const saat = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
+      div.innerHTML = `<div class="isim">${safe(m.name)} <span class="saat">${saat}</span></div><div class="icerik">${safe(m.message)}</div>`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+  });
+  durum("✓ Aktif");
+}
+
+// ── MESAJ GÖNDER ──
 async function gonder() {
   const text = document.getElementById("mesajIn").value.trim();
   if (!text) return;
   hataGizle("chatErr");
   document.getElementById("gonderBtn").disabled = true;
   document.getElementById("mesajIn").value = "";
-  const { error } = await sb.from("messages").insert([{ room: oda, name: isim, message: text }]);
+  const { error } = await sb.from("messages").insert([{ room: aktifOda.id, name: aktifIsim, message: text }]);
   document.getElementById("gonderBtn").disabled = false;
   if (error) { document.getElementById("mesajIn").value = text; hata("chatErr", "Gönderilemedi: " + error.message); }
   else { await mesajlariYukle(); }
   document.getElementById("mesajIn").focus();
 }
 
-function cik() {
-  clearInterval(timer); timer = null;
-  oda = ""; isim = "";
-  document.getElementById("mesajlar").innerHTML = "";
-  document.getElementById("chatDiv").classList.add("hidden");
-  document.getElementById("joinDiv").classList.remove("hidden");
+// ── YENİ ODA ──
+function yeniOdaGoster() { goster("yeniOdaForm"); }
+function yeniOdaGizle() { gizle("yeniOdaForm"); }
+
+async function odaOlustur() {
+  const ad = document.getElementById("yeniAd").value.trim();
+  const sifre = document.getElementById("yeniSifre").value.trim();
+  const isim = document.getElementById("yeniIsim").value.trim();
+  if (!ad || !isim) { hata("yeniErr", "Oda adı ve isim zorunlu!"); return; }
+  hataGizle("yeniErr");
+  const { data, error } = await sb.from("rooms").insert([{ name: ad, password: sifre || null }]).select().single();
+  if (error) { hata("yeniErr", "Oda oluşturulamadı: " + error.message); return; }
+  aktifOda = data;
+  aktifIsim = isim;
+  yeniOdaGizle();
+  gizle("anaSayfa");
+  await sohbeteGir();
 }
 
-document.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    if (!document.getElementById("chatDiv").classList.contains("hidden")) gonder();
-    else gir();
-  }
+// ── ÇIKIŞ ──
+function cik() {
+  clearInterval(timer); timer = null;
+  aktifOda = null; aktifIsim = "";
+  document.getElementById("mesajlar").innerHTML = "";
+  gizle("chatSayfasi");
+  goster("anaSayfa");
+  odalariYukle();
+}
+
+function anaSayfayaDon() {
+  gizle("sifreSayfasi");
+  gizle("isimSayfasi");
+  goster("anaSayfa");
+}
+
+// ── ENTER ──
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  if (!document.getElementById("chatSayfasi").classList.contains("hidden")) gonder();
+  else if (!document.getElementById("sifreSayfasi").classList.contains("hidden")) sifreDogrula();
+  else if (!document.getElementById("isimSayfasi").classList.contains("hidden")) isimleGir();
+  else if (!document.getElementById("yeniOdaForm").classList.contains("hidden")) odaOlustur();
 });
+
+// ── BAŞLAT ──
+odalariYukle();
 </script>
 </body>
 </html>
