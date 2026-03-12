@@ -728,7 +728,7 @@
   </div>
 </div>
 
-<div class="ver">v6.4</div>
+<div class="ver">v6.6</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1608,20 +1608,21 @@ async function kayitOl(){
   if(!email.includes("@")){ el("kayitErr").textContent="Geçerli bir e-posta gir!"; return; }
   if(s1.length < 6){ el("kayitErr").textContent="Şifre en az 6 karakter olmalı!"; return; }
   if(s1!==s2){ el("kayitErr").textContent="Şifreler eşleşmiyor!"; return; }
-  el("kayitErr").textContent="Kontrol ediliyor...";
+  el("kayitErr").textContent="Adım 1: Kullanıcı adı kontrol...";
   // Kullanıcı adı kontrolü
   const {data:mevcutlar} = await sb.from("users").select("id").eq("username",ad);
   if(mevcutlar && mevcutlar.length>0){ el("kayitErr").textContent="Bu kullanıcı adı alınmış! ❌"; return; }
+  el("kayitErr").textContent="Adım 2: E-posta kontrol...";
   // E-posta kontrolü
   const {data:emailMevcut} = await sb.from("users").select("id").eq("email",email);
   if(emailMevcut && emailMevcut.length>0){ el("kayitErr").textContent="Bu e-posta zaten kayıtlı! ❌"; return; }
   el("kayitErr").textContent="";
   // Supabase Auth ile kayıt
-  el("kayitErr").textContent="Kayıt yapılıyor...";
+  el("kayitErr").textContent="Adım 3: Auth kayıt...";
   const {data:authData, error:authError} = await sb.auth.signUp({email, password:s1});
   if(authError){ el("kayitErr").textContent="Auth hatası: "+authError.message; return; }
   if(!authData||!authData.user){ el("kayitErr").textContent="Kayıt hatası: kullanıcı oluşturulamadı!"; return; }
-  // users tablosuna kaydet
+  el("kayitErr").textContent="Adım 4: DB kaydı...";
   const {data,error} = await sb.from("users").insert([{id:authData.user.id, username:ad, email}]).select().single();
   if(error||!data){
     // Auth'tan da sil
