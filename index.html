@@ -728,7 +728,7 @@
   </div>
 </div>
 
-<div class="ver">v6.2</div>
+<div class="ver">v6.3</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1616,11 +1616,17 @@ async function kayitOl(){
   if(emailMevcut && emailMevcut.length>0){ el("kayitErr").textContent="Bu e-posta zaten kayıtlı! ❌"; return; }
   el("kayitErr").textContent="";
   // Supabase Auth ile kayıt
+  el("kayitErr").textContent="Kayıt yapılıyor...";
   const {data:authData, error:authError} = await sb.auth.signUp({email, password:s1});
-  if(authError){ el("kayitErr").textContent="Kayıt hatası: "+authError.message; return; }
+  if(authError){ el("kayitErr").textContent="Auth hatası: "+authError.message; return; }
+  if(!authData||!authData.user){ el("kayitErr").textContent="Kayıt hatası: kullanıcı oluşturulamadı!"; return; }
   // users tablosuna kaydet
   const {data,error} = await sb.from("users").insert([{id:authData.user.id, username:ad, email}]).select().single();
-  if(error||!data){ el("kayitErr").textContent="Kayıt hatası: "+(error?.message||"Bilinmeyen hata"); console.error(error); return; }
+  if(error||!data){
+    // Auth'tan da sil
+    el("kayitErr").textContent="DB hatası: "+(error?.message||"Bilinmeyen hata");
+    return;
+  }
   // OTP formuna geç
   bekleyenEmail = email;
   bekleyenKayit = {id:authData.user.id, username:ad, email, created_at:data.created_at};
