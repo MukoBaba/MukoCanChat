@@ -11,66 +11,94 @@
     h1 { color: #ffd54a; text-align: center; margin-bottom: 4px; font-size: 26px; }
     .subtitle { color: #aa98d9; text-align: center; font-size: 13px; margin-bottom: 20px; }
     .card { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #53308b; background: #120824; color: #fff; margin-top: 10px; font-size: 16px; outline: none; }
+    input[type=text], input[type=password], input[type=number] { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #53308b; background: #120824; color: #fff; margin-top: 10px; font-size: 16px; outline: none; }
     input:focus { border-color: #8c52ff; }
     button { width: 100%; padding: 13px; border-radius: 10px; border: none; background: #6a2cff; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     button:hover { opacity: 0.9; }
     .btn-gray { background: #3d1a7a; }
     .btn-red { background: #7a1010; }
+    .btn-yellow { background: #7a5c00; }
     .error { color: #ff6b6b; font-size: 13px; background: rgba(255,0,0,0.1); padding: 8px; border-radius: 8px; margin-top: 8px; display: none; }
     .status { color: #7dffbc; font-size: 13px; text-align: center; margin: 5px 0; }
     .section-title { color: #ffd54a; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
     .label { font-size: 12px; color: #aa98d9; margin-top: 12px; margin-bottom: -6px; display: block; }
-
-    /* ODA LİSTESİ */
     .oda-item { background: #120824; border: 1px solid #3d216d; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; }
     .oda-item:hover { border-color: #8c52ff; }
     .oda-adi { font-size: 16px; font-weight: bold; color: #fff; }
-    .oda-info { font-size: 12px; color: #aa98d9; margin-top: 3px; display: flex; gap: 8px; }
+    .oda-info { font-size: 12px; color: #aa98d9; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
     .oda-bos { color: #aa98d9; font-size: 14px; text-align: center; padding: 20px; }
     .yeni-btn { background: #1f0d3d; border: 1px dashed #53308b; border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; color: #aa98d9; font-size: 14px; margin-bottom: 16px; }
     .yeni-btn:hover { border-color: #8c52ff; color: #fff; }
-
-    /* SOHBET */
     .chat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .chat-header h2 { color: #ffd54a; font-size: 18px; }
     .chat-box { height: 300px; overflow-y: auto; background: #120824; border: 1px solid #53308b; border-radius: 10px; padding: 10px; margin: 8px 0; }
-    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; position: relative; }
+    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
     .msg.benim { border-left-color: #ffd54a; background: #1f1000; }
     .isim { color: #ffd54a; font-size: 12px; font-weight: bold; }
     .msg.benim .isim { color: #ffb300; }
     .icerik { color: #fff; font-size: 15px; margin-top: 2px; }
     .saat { color: #aa98d9; font-size: 11px; }
     .alinti-blok { background: #0d0820; border-left: 2px solid #8c52ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #aa98d9; margin-bottom: 4px; }
-    .alinti-btn { cursor: pointer; font-size: 11px; color: #53308b; margin-left:6px; }
+    .alinti-btn { cursor: pointer; font-size: 11px; color: #53308b; margin-left: 6px; }
     .alinti-btn:hover { color: #aa98d9; }
     .alinti-onizleme { display: none; background: #120824; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 6px 10px; margin-top: 8px; font-size: 12px; color: #aa98d9; justify-content: space-between; align-items: center; }
     .row { display: flex; gap: 8px; margin-top: 10px; }
     .row input { flex: 1; margin-top: 0; }
     .row button { width: auto; padding: 12px 18px; margin-top: 0; flex-shrink: 0; }
-
-    /* ÇEVRİMİÇİ */
     .online-ozet { display: inline-flex; align-items: center; gap: 6px; background: #0d0820; border: 1px solid #2a1f4a; border-radius: 20px; padding: 5px 12px; cursor: pointer; font-size: 13px; color: #7dffbc; margin: 6px 0; }
     .online-ozet:hover { border-color: #7dffbc; }
     .online-nokta { width: 8px; height: 8px; border-radius: 50%; background: #7dffbc; box-shadow: 0 0 5px #7dffbc; flex-shrink: 0; }
-
-    /* POPUP */
+    .duyuru-banner { background: rgba(255,200,0,0.08); border: 1px solid #7a5c00; border-radius: 10px; padding: 8px 12px; margin: 6px 0; font-size: 13px; color: #ffd54a; text-align: center; }
     .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; }
-    .popup-kutu { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; width: 280px; max-height: 360px; overflow-y: auto; }
+    .popup-kutu { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; width: 290px; max-height: 360px; overflow-y: auto; }
     .popup-baslik { color: #ffd54a; font-weight: bold; font-size: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .popup-kapat { cursor: pointer; color: #aa98d9; font-size: 20px; line-height: 1; padding: 0 4px; }
     .popup-kapat:hover { color: #fff; }
     .popup-kisi { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #2a1f4a; font-size: 14px; }
     .popup-kisi:last-child { border-bottom: none; }
-
-    /* YÖNETİCİ PANEL */
     .yonetici-panel { display: none; background: #1a0b33; border: 1px solid #3d216d; border-radius: 12px; padding: 16px; margin-top: 4px; }
     .alt-cikinti { text-align: center; margin-top: 6px; }
     .alt-cikinti-btn { display: inline-block; background: #1f0d3d; border: 1px solid #3d216d; border-top: none; border-radius: 0 0 12px 12px; padding: 4px 24px; cursor: pointer; font-size: 12px; color: #aa98d9; }
-    .alt-cikinti-btn:hover { color: #fff; border-color: #8c52ff; }
+    .alt-cikinti-btn:hover { color: #fff; }
+
+    /* KVKK */
+    .kvkk-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .kvkk-kutu { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 24px; max-width: 440px; width: 100%; }
+    .kvkk-baslik { color: #ffd54a; font-size: 17px; font-weight: bold; margin-bottom: 12px; }
+    .kvkk-metin { font-size: 13px; color: #c8bde0; line-height: 1.6; max-height: 220px; overflow-y: auto; background: #120824; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+    .kvkk-onay { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #aa98d9; margin-bottom: 14px; cursor: pointer; }
+    .kvkk-onay input[type=checkbox] { width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; margin-top: 1px; accent-color: #6a2cff; }
   </style>
 </head>
 <body>
+
+<!-- KVKK ONAY -->
+<div class="kvkk-overlay" id="kvkkOverlay">
+  <div class="kvkk-kutu">
+    <div class="kvkk-baslik">🔒 Gizlilik & Kullanım Koşulları</div>
+    <div class="kvkk-metin">
+      <b>MukoCan Chat Aydınlatma Metni</b><br><br>
+      Bu platformu kullanırken yazdığınız mesajlar ve seçtiğiniz takma isim, <b>Supabase</b> altyapısında saklanmaktadır. Veriler yalnızca sohbet işlevini yerine getirmek amacıyla kullanılmakta olup üçüncü taraflarla paylaşılmamaktadır.<br><br>
+      <b>Saklanan veriler:</b><br>
+      • Takma isim (gerçek isim değil)<br>
+      • Yazdığınız mesajlar<br>
+      • Mesaj tarihi ve saati<br>
+      • Geçici çevrimiçi durum bilgisi<br><br>
+      <b>Önemli notlar:</b><br>
+      • Gerçek adınızı veya kişisel bilgilerinizi yazmayınız.<br>
+      • Bu platform 13 yaş ve üzeri kullanıcılara yöneliktir.<br>
+      • Hakaret, tehdit veya yasadışı içerik paylaşmak yasaktır.<br>
+      • Verilerinizin silinmesini talep etmek için oda yöneticisiyle iletişime geçebilirsiniz.<br><br>
+      6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında bilgilendirilmiş olduğunuzu kabul edersiniz.
+    </div>
+    <label class="kvkk-onay">
+      <input type="checkbox" id="kvkkCheckbox" onchange="kvkkKontrol()" />
+      Aydınlatma metnini okudum, anladım ve kabul ediyorum.
+    </label>
+    <button id="kvkkBtn" onclick="kvkkKabul()" disabled style="opacity:0.4;">Devam Et</button>
+  </div>
+</div>
+
 <div class="wrap">
 
   <!-- ANA SAYFA -->
@@ -88,8 +116,8 @@
       <input id="yeniSifre" type="password" placeholder="Şifresiz bırakabilirsin" />
       <span class="label">Yönetici anahtarı</span>
       <input id="yeniYoneticiKey" type="password" placeholder="Gizli anahtar belirle" />
-      <span class="label">Maksimum kişi sayısı (opsiyonel)</span>
-      <input id="yeniMaxUser" type="number" placeholder="Varsayılan: 50" min="2" max="500" />
+      <span class="label">Maksimum kişi sayısı (varsayılan: 50)</span>
+      <input id="yeniMaxUser" type="number" placeholder="Boş bırakırsan 50 olur" min="2" max="500" />
       <span class="label">Takma ismin</span>
       <input id="yeniIsim" type="text" placeholder="Takma ismin" />
       <button onclick="odaOlustur()">Odayı Oluştur ve Gir</button>
@@ -142,6 +170,12 @@
         <span class="online-nokta"></span>
         <span id="onlineOzet">0 çevrimiçi</span>
       </div>
+
+      <!-- DUYURU BANNER -->
+      <div class="duyuru-banner" id="duyuruBanner" style="display:none">
+        📢 Duyuru modu açık — sadece yönetici yazabilir
+      </div>
+
       <div class="chat-box" id="mesajlar"></div>
       <div class="error" id="chatErr"></div>
 
@@ -151,10 +185,11 @@
         <span onclick="alintiTemizle()" style="cursor:pointer;color:#ff6b6b;font-size:16px;flex-shrink:0;">✕</span>
       </div>
 
-      <div class="row">
+      <div class="row" id="mesajRow">
         <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
         <button onclick="gonder()" id="gonderBtn" style="width:auto;padding:12px 18px;margin-top:0">Gönder</button>
       </div>
+      <div id="duyuruKilitBilgi" style="display:none;text-align:center;color:#aa98d9;font-size:13px;margin-top:8px;">🔇 Bu odada şu an sadece yönetici yazabilir</div>
 
       <!-- ALT ÇIKINTI -->
       <div class="alt-cikinti">
@@ -171,7 +206,8 @@
         </div>
         <div id="yoneticiOnaylandi" style="display:none;">
           <div style="color:#7dffbc;font-size:13px;margin-bottom:10px;">⭐ Yönetici olarak doğrulandın</div>
-          <button class="btn-red" style="font-size:13px;padding:10px;" onclick="odaSil()">🗑️ Odayı Sil</button>
+          <button id="duyuruToggleBtn" class="btn-yellow" style="font-size:13px;padding:10px;" onclick="duyuruToggle()">📢 Duyuru Modunu Aç</button>
+          <button class="btn-red" style="font-size:13px;padding:10px;margin-top:8px;" onclick="odaSil()">🗑️ Odayı Sil</button>
         </div>
       </div>
     </div>
@@ -207,6 +243,19 @@ function hata(id, msg) { const e = document.getElementById(id); e.textContent = 
 function hataGizle(id) { document.getElementById(id).style.display = "none"; }
 function durum(msg) { document.getElementById("durumYazi").textContent = msg; }
 
+// KVKK
+function kvkkKontrol() {
+  const cb = document.getElementById("kvkkCheckbox");
+  const btn = document.getElementById("kvkkBtn");
+  btn.disabled = !cb.checked;
+  btn.style.opacity = cb.checked ? "1" : "0.4";
+}
+function kvkkKabul() {
+  localStorage.setItem("kvkk_kabul", "1");
+  gizle("kvkkOverlay");
+}
+if (localStorage.getItem("kvkk_kabul") === "1") gizle("kvkkOverlay");
+
 // POPUP
 function popupAc() {
   const liste = document.getElementById("popupListe");
@@ -223,16 +272,15 @@ document.getElementById("onlinePopup").addEventListener("click", function(e) {
 // YÖNETİCİ PANEL
 function panelToggle() {
   const p = document.getElementById("yoneticiPanel");
-  p.style.display = p.style.display === "none" || p.style.display === "" ? "block" : "none";
+  p.style.display = (p.style.display === "none" || p.style.display === "") ? "block" : "none";
 }
 
 // ODA LİSTESİ
 async function odalariYukle() {
-  const { data } = await sb.from("rooms").select("id,name,password,max_users,created_at").order("created_at", {ascending: false});
+  const { data } = await sb.from("rooms").select("id,name,password,max_users,duyuru_modu,created_at").order("created_at", {ascending: false});
   tumOdalar = data || [];
   odalariGoster(tumOdalar);
 }
-
 function odalariGoster(odalar) {
   const liste = document.getElementById("odaListesi");
   if (!odalar || odalar.length === 0) { liste.innerHTML = '<div class="oda-bos">Oda bulunamadı.</div>'; return; }
@@ -240,13 +288,15 @@ function odalariGoster(odalar) {
   odalar.forEach(oda => {
     const div = document.createElement("div");
     div.className = "oda-item";
-    const limitBilgi = oda.max_users ? `👥 Maks ${oda.max_users}` : "";
-    div.innerHTML = `<div><div class="oda-adi">${safe(oda.name)}</div><div class="oda-info"><span>${oda.password ? "🔒 Şifreli" : "🔓 Açık"}</span>${limitBilgi ? `<span>${limitBilgi}</span>` : ""}</div></div><div style="font-size:20px">${oda.password ? "🔑" : "➡️"}</div>`;
+    const etiketler = [];
+    if (oda.password) etiketler.push("🔒 Şifreli"); else etiketler.push("🔓 Açık");
+    if (oda.max_users) etiketler.push(`👥 Maks ${oda.max_users}`);
+    if (oda.duyuru_modu) etiketler.push("📢 Duyuru");
+    div.innerHTML = `<div><div class="oda-adi">${safe(oda.name)}</div><div class="oda-info">${etiketler.map(e => `<span>${e}</span>`).join("")}</div></div><div style="font-size:20px">${oda.password ? "🔑" : "➡️"}</div>`;
     div.onclick = () => odayaTikla(oda);
     liste.appendChild(div);
   });
 }
-
 function odalariFiltrele() {
   const q = document.getElementById("odaArama").value.toLowerCase();
   odalariGoster(tumOdalar.filter(o => o.name.toLowerCase().includes(q)));
@@ -309,13 +359,56 @@ async function sohbeteGir() {
   document.getElementById("yoneticiKeyGir").value = "";
   hataGizle("yoneticiErr");
   alintiTemizle();
+  duyuruDurumGuncelle();
   durum("Yükleniyor...");
   await presenceGir();
   await mesajlariYukle();
   await onlineGuncelle();
-  timer = setInterval(async () => { await mesajlariYukle(); await onlineGuncelle(); }, 3000);
+  timer = setInterval(async () => {
+    await mesajlariYukle();
+    await onlineGuncelle();
+    await odaDurumGuncelle();
+  }, 3000);
   presenceTimer = setInterval(presenceYenile, 10000);
   document.getElementById("mesajIn").focus();
+}
+
+// DUYURU MODU
+function duyuruDurumGuncelle() {
+  const duyuruAcik = aktifOda.duyuru_modu;
+  if (duyuruAcik) {
+    goster("duyuruBanner");
+    if (!yoneticiMi) {
+      gizle("mesajRow");
+      goster("duyuruKilitBilgi");
+    } else {
+      goster("mesajRow");
+      gizle("duyuruKilitBilgi");
+    }
+    if (document.getElementById("duyuruToggleBtn"))
+      document.getElementById("duyuruToggleBtn").textContent = "📢 Duyuru Modunu Kapat";
+  } else {
+    gizle("duyuruBanner");
+    goster("mesajRow");
+    gizle("duyuruKilitBilgi");
+    if (document.getElementById("duyuruToggleBtn"))
+      document.getElementById("duyuruToggleBtn").textContent = "📢 Duyuru Modunu Aç";
+  }
+}
+
+async function odaDurumGuncelle() {
+  const { data } = await sb.from("rooms").select("duyuru_modu").eq("id", aktifOda.id).single();
+  if (data && data.duyuru_modu !== aktifOda.duyuru_modu) {
+    aktifOda.duyuru_modu = data.duyuru_modu;
+    duyuruDurumGuncelle();
+  }
+}
+
+async function duyuruToggle() {
+  const yeni = !aktifOda.duyuru_modu;
+  await sb.from("rooms").update({ duyuru_modu: yeni }).eq("id", aktifOda.id);
+  aktifOda.duyuru_modu = yeni;
+  duyuruDurumGuncelle();
 }
 
 // PRESENCE
@@ -354,12 +447,7 @@ async function mesajlariYukle() {
       div.dataset.mesaj = m.message;
       const saat = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit",minute:"2-digit"});
       const alintiBlok = m.reply_to ? `<div class="alinti-blok">↩️ ${safe(m.reply_to)}</div>` : "";
-      div.innerHTML = `
-        <div class="isim">${safe(m.name)} <span class="saat">${saat}</span>
-          <span class="alinti-btn" onclick="alintiYap(this)">↩️</span>
-        </div>
-        ${alintiBlok}
-        <div class="icerik">${safe(m.message)}</div>`;
+      div.innerHTML = `<div class="isim">${safe(m.name)} <span class="saat">${saat}</span><span class="alinti-btn" onclick="alintiYap(this)">↩️</span></div>${alintiBlok}<div class="icerik">${safe(m.message)}</div>`;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     }
@@ -370,10 +458,8 @@ async function mesajlariYukle() {
 // ALINTI
 function alintiYap(btn) {
   const msg = btn.closest(".msg");
-  const isim = msg.dataset.isim;
-  const metin = msg.dataset.mesaj;
-  alintiMsg = { isim, metin };
-  document.getElementById("alintiOnizlemeMetin").textContent = isim + ": " + metin;
+  alintiMsg = { isim: msg.dataset.isim, metin: msg.dataset.mesaj };
+  document.getElementById("alintiOnizlemeMetin").textContent = alintiMsg.isim + ": " + alintiMsg.metin;
   gosterflex("alintiOnizleme");
   document.getElementById("mesajIn").focus();
 }
@@ -384,6 +470,7 @@ function alintiTemizle() {
 
 // GÖNDER
 async function gonder() {
+  if (aktifOda.duyuru_modu && !yoneticiMi) return;
   const text = document.getElementById("mesajIn").value.trim();
   if (!text) return;
   hataGizle("chatErr");
@@ -408,6 +495,7 @@ async function yoneticiDogrula() {
     yoneticiMi = true;
     document.getElementById("yoneticiGiris").style.display = "none";
     document.getElementById("yoneticiOnaylandi").style.display = "block";
+    duyuruDurumGuncelle();
   } else { hata("yoneticiErr", "Yanlış anahtar!"); }
 }
 
@@ -434,7 +522,8 @@ async function odaOlustur() {
   hataGizle("yeniErr");
   const { data, error } = await sb.from("rooms").insert([{
     name: ad, password: sifre || null, owner_key: yKey,
-    max_users: maxU ? parseInt(maxU) : 50
+    max_users: maxU ? parseInt(maxU) : 50,
+    duyuru_modu: false
   }]).select().single();
   if (error) { hata("yeniErr", "Hata: " + error.message); return; }
   aktifOda = data; aktifIsim = isim;
@@ -444,6 +533,7 @@ async function odaOlustur() {
   goster("yoneticiPanel");
   document.getElementById("yoneticiGiris").style.display = "none";
   document.getElementById("yoneticiOnaylandi").style.display = "block";
+  duyuruDurumGuncelle();
 }
 
 // ÇIKIŞ
