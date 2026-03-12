@@ -87,6 +87,7 @@
     </div>
     <div class="card">
       <div class="section-title">Odalar</div>
+      <input id="odaArama" type="text" placeholder="🔍 Oda ara..." oninput="odalariFiltrele()" />
       <div id="odaListesi"><div class="oda-bos">Yükleniyor...</div></div>
     </div>
   </div>
@@ -193,18 +194,31 @@ document.getElementById("onlinePopup").addEventListener("click", function(e) {
   if (e.target === this) popupKapat();
 });
 
+let tumOdalar = [];
+
 async function odalariYukle() {
   const { data } = await sb.from("rooms").select("id,name,password,created_at").order("created_at", {ascending: false});
+  tumOdalar = data || [];
+  odalariGoster(tumOdalar);
+}
+
+function odalariGoster(odalar) {
   const liste = document.getElementById("odaListesi");
-  if (!data || data.length === 0) { liste.innerHTML = '<div class="oda-bos">Henüz oda yok. İlk odayı sen oluştur!</div>'; return; }
+  if (!odalar || odalar.length === 0) { liste.innerHTML = '<div class="oda-bos">Oda bulunamadı.</div>'; return; }
   liste.innerHTML = "";
-  data.forEach(oda => {
+  odalar.forEach(oda => {
     const div = document.createElement("div");
     div.className = "oda-item";
     div.innerHTML = `<div><div class="oda-adi">${safe(oda.name)}</div><div class="oda-info">${oda.password ? "🔒 Şifreli" : "🔓 Açık"}</div></div><div style="font-size:20px">${oda.password ? "🔑" : "➡️"}</div>`;
     div.onclick = () => odayaTikla(oda);
     liste.appendChild(div);
   });
+}
+
+function odalariFiltrele() {
+  const q = document.getElementById("odaArama").value.toLowerCase();
+  const filtrelenen = tumOdalar.filter(o => o.name.toLowerCase().includes(q));
+  odalariGoster(filtrelenen);
 }
 
 function odayaTikla(oda) {
