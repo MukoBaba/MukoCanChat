@@ -682,7 +682,7 @@
   </div>
 </div>
 
-<div class="ver">v4.4</div>
+<div class="ver">v4.7</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -721,15 +721,18 @@ function chatGoster(){
   setirChatYukseklik();
   if(window.visualViewport){
     window.visualViewport.removeEventListener('resize', setirChatYukseklik);
+    window.visualViewport.removeEventListener('scroll', setirChatYukseklik);
     window.visualViewport.addEventListener('resize', setirChatYukseklik);
+    window.visualViewport.addEventListener('scroll', setirChatYukseklik);
   } else {
     window.removeEventListener('resize', setirChatYukseklik);
     window.addEventListener('resize', setirChatYukseklik);
   }
 }
 function setirChatYukseklik(){
-  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  const y = window.visualViewport ? window.visualViewport.offsetTop : 0;
+  const vv = window.visualViewport;
+  const h = vv ? vv.height : window.innerHeight;
+  const y = vv ? vv.offsetTop : 0;
   const chat = el("chatSayfasi");
   chat.style.position = "fixed";
   chat.style.top = y + "px";
@@ -738,8 +741,23 @@ function setirChatYukseklik(){
   chat.style.height = h + "px";
   chat.style.maxWidth = "460px";
   chat.style.margin = "0 auto";
+  // Input alanını her zaman görünür yap
+  const inputArea = el("inputArea");
+  if(inputArea){
+    inputArea.style.position = "sticky";
+    inputArea.style.bottom = "0";
+  }
   const box = el("mesajlar");
-  if(box) setTimeout(()=>{ box.scrollTop = box.scrollHeight; }, 50);
+  if(box){
+    setTimeout(()=>{
+      box.scrollTop = box.scrollHeight;
+      // Input görünür değilse scroll et
+      const input = el("mesajInput");
+      if(input && document.activeElement === input){
+        input.scrollIntoView({block:"end", behavior:"smooth"});
+      }
+    }, 80);
+  }
 }
 
 // KVKK
@@ -967,7 +985,7 @@ async function mesajlariYukle(){
     div.innerHTML=`${alintiBlok}<div class="msg-icerik">${safe(m.message)}</div><div class="msg-alt"><span class="msg-saat">${saat}</span><span class="alinti-btn" onclick="alintiYap(this)">↩</span><span class="ilet-btn" onclick="iletAc(this)">↗</span></div>`;
     let tapTimer=null;
     div.addEventListener("click",()=>{
-      if(tapTimer){clearTimeout(tapTimer);tapTimer=null;iletAc(div);}
+      if(tapTimer){clearTimeout(tapTimer);tapTimer=null;alintiYapDiv(div);}
       else{tapTimer=setTimeout(()=>{tapTimer=null;},300);}
     });
     grup.appendChild(div);
@@ -1000,6 +1018,17 @@ function iletMesajiGonder(){
 }
 
 // ALINTI
+function alintiYapDiv(div){
+  const mesaj = div.dataset.mesaj;
+  const isim = div.dataset.isim;
+  if(!mesaj) return;
+  aktifAlinti = isim + ": " + mesaj;
+  el("alintiOnizleme").textContent = "↩ " + aktifAlinti;
+  el("alintiBar").style.display = "flex";
+  el("mesajInput").focus();
+  setTimeout(setirChatYukseklik, 100);
+}
+
 function alintiYap(btn){
   const m=btn.closest(".msg");
   alintiMsg={isim:m.dataset.isim,metin:m.dataset.mesaj};
@@ -1092,18 +1121,11 @@ async function odaOlustur(){
   hataGizle("yeniErr");
   // Max 3 oda kontrolü
   if(aktifHesap){
-    const keyler=[];
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k&&k.startsWith("ownerKey_")) keyler.push(localStorage.getItem(k));
-    }
-    if(keyler.length>=3){
-      const{count}=await sb.from("rooms").select("id",{count:"exact",head:true}).in("owner_key",keyler);
-      if(count>=3){hata("yeniErr","En fazla 3 oda açabilirsin! 🚫");return;}
-    }
+    const{count}=await sb.from("rooms").select("id",{count:"exact",head:true}).eq("user_id",aktifHesap.id);
+    if(count>=3){hata("yeniErr","En fazla 3 oda açabilirsin! 🚫");return;}
   }
   const konu=el("yeniKonu").value.trim().substring(0,30);
-  const{data,error}=await sb.from("rooms").insert([{name:ad,password:sifre||null,owner_key:yKey,max_users:maxU?parseInt(maxU):50,duyuru_modu:false,konu:konu||null}]).select().single();
+  const{data,error}=await sb.from("rooms").insert([{name:ad,password:sifre||null,owner_key:yKey,max_users:maxU?parseInt(maxU):50,duyuru_modu:false,konu:konu||null,user_id:aktifHesap?aktifHesap.id:null}]).select().single();
   if(error){hata("yeniErr","Hata: "+error.message);return;}
   aktifOda=data;aktifIsim=isim;
   yeniOdaGizle();gizle("anaSayfa");
@@ -1482,27 +1504,28 @@ async function profilAc(){
   el("profilTarih").textContent = "Üyelik: "+tarih;
   // Bu kullanıcının kurduğu odalar - owner_key localStorage'da yok
   // owner_key varsa rooms'dan çekelim
-  const keyler = [];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith("ownerKey_")) keyler.push(localStorage.getItem(k));
-  }
   const odaDiv = el("profilOdalar");
-  if(keyler.length===0){ odaDiv.innerHTML='<div style="color:#2a1e42;font-size:13px">Henüz oda yok</div>'; }
+  const {data:odalar} = await sb.from("rooms").select("name,created_at").eq("user_id",aktifHesap.id).order("created_at",{ascending:false});
+  if(!odalar||odalar.length===0){ odaDiv.innerHTML='<div style="color:#2a1e42;font-size:13px">Henüz oda yok</div>'; }
   else {
-    const {data} = await sb.from("rooms").select("name,created_at").in("owner_key",keyler);
-    if(!data||data.length===0){ odaDiv.innerHTML='<div style="color:#2a1e42;font-size:13px">Henüz oda yok</div>'; }
-    else {
-      odaDiv.innerHTML = data.map(o=>`
-        <div class="profil-oda-item">
-          <span>#${safe(o.name)}</span>
+    odaDiv.innerHTML = odalar.map(o=>`
+      <div class="profil-oda-item">
+        <span>#${safe(o.name)}</span>
+        <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:11px;color:#2a1e42">${new Date(o.created_at).toLocaleDateString("tr-TR")}</span>
-        </div>`).join("");
-    }
+          <button onclick="profilOdaSil('${o.id}','${safe(o.name)}')" style="background:#1a0505;border:1px solid #3a1010;color:#f87171;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit">Sil</button>
+        </div>
+      </div>`).join("");
   }
   el("profilOverlay").style.display="flex";
 }
 function profilKapat(){ el("profilOverlay").style.display="none"; }
+
+async function profilOdaSil(odaId, odaAd){
+  if(!confirm("#"+odaAd+" odasını silmek istiyor musun? Bu işlem geri alınamaz!")) return;
+  await sb.from("rooms").delete().eq("id",odaId);
+  profilAc(); // listeyi yenile
+}
 
 // ===== DM SAYFA FONKSİYONLARI =====
 async function dmKullaniciAra(){
@@ -1694,6 +1717,14 @@ async function dmGonder(){
   await sb.from("direct_messages").insert([{from_id:aktifHesap.id, to_id:aktifDmKisi.id, message:msg}]);
   dmMesajlariYukle();
 }
+
+// Klavye takibi - sesli komut dahil
+document.addEventListener('focusin', function(e){
+  if(e.target && e.target.id === 'mesajInput'){
+    setTimeout(setirChatYukseklik, 150);
+    setTimeout(setirChatYukseklik, 400);
+  }
+});
 
 // Başlat
 authYukle();
