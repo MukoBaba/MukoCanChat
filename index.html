@@ -682,7 +682,7 @@
   </div>
 </div>
 
-<div class="ver">v4.3</div>
+<div class="ver">v4.4</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1442,10 +1442,12 @@ async function kayitOl(){
   if(s1.length < 4){ el("kayitErr").textContent="Şifre en az 4 karakter olmalı!"; return; }
   if(s1!==s2){ el("kayitErr").textContent="Şifreler eşleşmiyor!"; return; }
   // Kullanıcı adı var mı?
-  const {data:mevcut} = await sb.from("users").select("id").eq("username",ad).single();
-  if(mevcut){ el("kayitErr").textContent="Bu kullanıcı adı alınmış!"; return; }
+  el("kayitErr").textContent="Kontrol ediliyor...";
+  const {data:mevcutlar} = await sb.from("users").select("id").eq("username",ad);
+  if(mevcutlar && mevcutlar.length>0){ el("kayitErr").textContent="Bu kullanıcı adı alınmış! ❌"; return; }
+  el("kayitErr").textContent="";
   const {data,error} = await sb.from("users").insert([{username:ad,password:s1}]).select().single();
-  if(error||!data){ el("kayitErr").textContent="Kayıt hatası: "+( error?.message||""); return; }
+  if(error||!data){ el("kayitErr").textContent="Kayıt hatası: "+(error?.message||"Bilinmeyen hata"); return; }
   aktifHesap = {id:data.id, username:data.username, created_at:data.created_at};
   localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
   authGuncelle();
