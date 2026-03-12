@@ -452,7 +452,7 @@
         <div style="font-size:12px;color:#4a3a6a;margin-top:4px" id="otpEmailGoster"></div>
       </div>
       <span class="label" style="margin-top:0">6 haneli kod</span>
-      <input id="otpKod" type="number" placeholder="000000" maxlength="6" style="font-size:22px;text-align:center;letter-spacing:8px;font-weight:700" />
+      <input id="otpKod" type="text" inputmode="numeric" placeholder="000000" maxlength="6" style="font-size:22px;text-align:center;letter-spacing:8px;font-weight:700" />
       <button class="btn" onclick="otpDogrula()">Doğrula ✅</button>
       <div style="text-align:center;margin-top:8px"><span onclick="otpTekrarGonder()" style="font-size:12px;color:#4a3a6a;cursor:pointer;text-decoration:underline">Kodu tekrar gönder</span></div>
       <div class="err" id="otpErr"></div>
@@ -728,7 +728,7 @@
   </div>
 </div>
 
-<div class="ver">v6.0</div>
+<div class="ver">v6.2</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1619,8 +1619,8 @@ async function kayitOl(){
   const {data:authData, error:authError} = await sb.auth.signUp({email, password:s1});
   if(authError){ el("kayitErr").textContent="Kayıt hatası: "+authError.message; return; }
   // users tablosuna kaydet
-  const {data,error} = await sb.from("users").insert([{id:authData.user.id, username:ad, email, password:s1}]).select().single();
-  if(error||!data){ el("kayitErr").textContent="Kayıt hatası: "+(error?.message||""); return; }
+  const {data,error} = await sb.from("users").insert([{id:authData.user.id, username:ad, email}]).select().single();
+  if(error||!data){ el("kayitErr").textContent="Kayıt hatası: "+(error?.message||"Bilinmeyen hata"); console.error(error); return; }
   // OTP formuna geç
   bekleyenEmail = email;
   bekleyenKayit = {id:authData.user.id, username:ad, email, created_at:data.created_at};
@@ -1654,8 +1654,8 @@ let bekleyenEmail = null;
 let bekleyenKayit = null;
 
 async function otpDogrula(){
-  const kod = el("otpKod").value.trim();
-  if(kod.length !== 6){ el("otpErr").textContent="6 haneli kodu gir!"; return; }
+  const kod = el("otpKod").value.trim().replace(/\s/g,"");
+  if(kod.length !== 6 || !/^\d+$/.test(kod)){ el("otpErr").textContent="6 haneli sayısal kodu gir!"; return; }
   el("otpErr").textContent="Doğrulanıyor...";
   const {error} = await sb.auth.verifyOtp({email: bekleyenEmail, token: kod, type: "signup"});
   if(error){ el("otpErr").textContent="❌ Hatalı veya süresi dolmuş kod!"; return; }
