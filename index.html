@@ -26,7 +26,7 @@
     .oda-item { background: #120824; border: 1px solid #3d216d; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; }
     .oda-item:hover { border-color: #8c52ff; }
     .oda-adi { font-size: 16px; font-weight: bold; color: #fff; }
-    .oda-info { font-size: 12px; color: #aa98d9; margin-top: 3px; }
+    .oda-info { font-size: 12px; color: #aa98d9; margin-top: 3px; display: flex; gap: 8px; }
     .oda-bos { color: #aa98d9; font-size: 14px; text-align: center; padding: 20px; }
     .yeni-btn { background: #1f0d3d; border: 1px dashed #53308b; border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; color: #aa98d9; font-size: 14px; margin-bottom: 16px; }
     .yeni-btn:hover { border-color: #8c52ff; color: #fff; }
@@ -34,17 +34,20 @@
     /* SOHBET */
     .chat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .chat-header h2 { color: #ffd54a; font-size: 18px; }
-    .chat-box { height: 320px; overflow-y: auto; background: #120824; border: 1px solid #53308b; border-radius: 10px; padding: 10px; margin: 8px 0; }
-    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+    .chat-box { height: 300px; overflow-y: auto; background: #120824; border: 1px solid #53308b; border-radius: 10px; padding: 10px; margin: 8px 0; }
+    .msg { background: #241046; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; position: relative; }
     .msg.benim { border-left-color: #ffd54a; background: #1f1000; }
     .isim { color: #ffd54a; font-size: 12px; font-weight: bold; }
     .msg.benim .isim { color: #ffb300; }
     .icerik { color: #fff; font-size: 15px; margin-top: 2px; }
     .saat { color: #aa98d9; font-size: 11px; }
+    .alinti-blok { background: #0d0820; border-left: 2px solid #8c52ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #aa98d9; margin-bottom: 4px; }
+    .alinti-btn { cursor: pointer; font-size: 11px; color: #53308b; margin-left:6px; }
+    .alinti-btn:hover { color: #aa98d9; }
+    .alinti-onizleme { display: none; background: #120824; border-left: 3px solid #8c52ff; border-radius: 8px; padding: 6px 10px; margin-top: 8px; font-size: 12px; color: #aa98d9; justify-content: space-between; align-items: center; }
     .row { display: flex; gap: 8px; margin-top: 10px; }
     .row input { flex: 1; margin-top: 0; }
     .row button { width: auto; padding: 12px 18px; margin-top: 0; flex-shrink: 0; }
-    .yonetici-kutu { background: rgba(255,200,0,0.07); border: 1px solid #7a5c00; border-radius: 10px; padding: 10px 14px; margin-top: 10px; font-size: 13px; color: #ffd54a; }
 
     /* ÇEVRİMİÇİ */
     .online-ozet { display: inline-flex; align-items: center; gap: 6px; background: #0d0820; border: 1px solid #2a1f4a; border-radius: 20px; padding: 5px 12px; cursor: pointer; font-size: 13px; color: #7dffbc; margin: 6px 0; }
@@ -53,12 +56,18 @@
 
     /* POPUP */
     .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; }
-    .popup-kutu { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; width: 280px; max-height: 400px; overflow-y: auto; }
+    .popup-kutu { background: #1a0b33; border: 1px solid #3d216d; border-radius: 16px; padding: 20px; width: 280px; max-height: 360px; overflow-y: auto; }
     .popup-baslik { color: #ffd54a; font-weight: bold; font-size: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .popup-kapat { cursor: pointer; color: #aa98d9; font-size: 20px; line-height: 1; padding: 0 4px; }
     .popup-kapat:hover { color: #fff; }
     .popup-kisi { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #2a1f4a; font-size: 14px; }
     .popup-kisi:last-child { border-bottom: none; }
+
+    /* YÖNETİCİ PANEL */
+    .yonetici-panel { display: none; background: #1a0b33; border: 1px solid #3d216d; border-radius: 12px; padding: 16px; margin-top: 4px; }
+    .alt-cikinti { text-align: center; margin-top: 6px; }
+    .alt-cikinti-btn { display: inline-block; background: #1f0d3d; border: 1px solid #3d216d; border-top: none; border-radius: 0 0 12px 12px; padding: 4px 24px; cursor: pointer; font-size: 12px; color: #aa98d9; }
+    .alt-cikinti-btn:hover { color: #fff; border-color: #8c52ff; }
   </style>
 </head>
 <body>
@@ -79,6 +88,8 @@
       <input id="yeniSifre" type="password" placeholder="Şifresiz bırakabilirsin" />
       <span class="label">Yönetici anahtarı</span>
       <input id="yeniYoneticiKey" type="password" placeholder="Gizli anahtar belirle" />
+      <span class="label">Maksimum kişi sayısı (opsiyonel)</span>
+      <input id="yeniMaxUser" type="number" placeholder="Varsayılan: 50" min="2" max="500" />
       <span class="label">Takma ismin</span>
       <input id="yeniIsim" type="text" placeholder="Takma ismin" />
       <button onclick="odaOlustur()">Odayı Oluştur ve Gir</button>
@@ -87,7 +98,7 @@
     </div>
     <div class="card">
       <div class="section-title">Odalar</div>
-      <input id="odaArama" type="text" placeholder="🔍 Oda ara..." oninput="odalariFiltrele()" style="margin-bottom:10px;padding:9px 12px;font-size:14px;" />
+      <input id="odaArama" type="text" placeholder="🔍 Oda ara..." oninput="odalariFiltrele()" style="padding:9px 12px;font-size:14px;margin-bottom:12px;" />
       <div id="odaListesi" style="max-height:260px;overflow-y:auto;"><div class="oda-bos">Yükleniyor...</div></div>
     </div>
   </div>
@@ -118,7 +129,7 @@
 
   <!-- SOHBET EKRANI -->
   <div id="chatSayfasi" style="display:none">
-    <div class="card" style="padding-bottom:10px">
+    <div class="card" style="padding-bottom:4px">
       <div class="chat-header">
         <h2 id="chatOdaAdi">Oda</h2>
         <div style="display:flex;gap:6px;align-items:center">
@@ -133,19 +144,23 @@
       </div>
       <div class="chat-box" id="mesajlar"></div>
       <div class="error" id="chatErr"></div>
+
+      <!-- ALINTI ÖNİZLEME -->
+      <div class="alinti-onizleme" id="alintiOnizleme">
+        <span id="alintiOnizlemeMetin" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88%"></span>
+        <span onclick="alintiTemizle()" style="cursor:pointer;color:#ff6b6b;font-size:16px;flex-shrink:0;">✕</span>
+      </div>
+
       <div class="row">
         <input id="mesajIn" type="text" placeholder="Mesaj yaz..." />
         <button onclick="gonder()" id="gonderBtn" style="width:auto;padding:12px 18px;margin-top:0">Gönder</button>
       </div>
-      <!-- ALT ÇIKINTI -->
-      <div style="text-align:center;margin-top:6px">
-        <div onclick="panelToggle()" style="display:inline-block;background:#1f0d3d;border:1px solid #3d216d;border-radius:0 0 12px 12px;padding:4px 24px;cursor:pointer;font-size:12px;color:#aa98d9;">
-          ⚙️ Yönetici
-        </div>
-      </div>
 
-      <!-- YÖNETİCİ PANELİ -->
-      <div id="yoneticiPanel" style="display:none;background:#1a0b33;border:1px solid #3d216d;border-radius:12px;padding:16px;margin-top:4px;">
+      <!-- ALT ÇIKINTI -->
+      <div class="alt-cikinti">
+        <div class="alt-cikinti-btn" onclick="panelToggle()">⚙️ Yönetici</div>
+      </div>
+      <div class="yonetici-panel" id="yoneticiPanel">
         <div id="yoneticiGiris">
           <div style="font-size:13px;color:#aa98d9;margin-bottom:8px;">Yönetici anahtarını gir:</div>
           <div style="display:flex;gap:8px;">
@@ -164,9 +179,9 @@
 
 </div>
 
-<!-- POPUP - wrap dışında, sadece flex ile gösterilecek -->
+<!-- ÇEVRİMİÇİ POPUP -->
 <div class="popup-overlay" id="onlinePopup">
-  <div class="popup-kutu" onclick="event.stopPropagation()" style="max-height:320px;overflow-y:auto;">
+  <div class="popup-kutu" onclick="event.stopPropagation()">
     <div class="popup-baslik">
       🟢 Çevrimiçi
       <span class="popup-kapat" onclick="popupKapat()">✕</span>
@@ -182,7 +197,7 @@ const KEY_ = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb = window.supabase.createClient(URL_, KEY_);
 
 let aktifOda = null, aktifIsim = "", timer = null, presenceTimer = null, presenceId = null, yoneticiMi = false;
-let onlineKisiler = [];
+let onlineKisiler = [], tumOdalar = [], alintiMsg = null;
 
 function safe(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 function goster(id) { document.getElementById(id).style.display = "block"; }
@@ -192,6 +207,7 @@ function hata(id, msg) { const e = document.getElementById(id); e.textContent = 
 function hataGizle(id) { document.getElementById(id).style.display = "none"; }
 function durum(msg) { document.getElementById("durumYazi").textContent = msg; }
 
+// POPUP
 function popupAc() {
   const liste = document.getElementById("popupListe");
   liste.innerHTML = onlineKisiler.length === 0
@@ -200,15 +216,19 @@ function popupAc() {
   gosterflex("onlinePopup");
 }
 function popupKapat() { gizle("onlinePopup"); }
-
 document.getElementById("onlinePopup").addEventListener("click", function(e) {
   if (e.target === this) popupKapat();
 });
 
-let tumOdalar = [];
+// YÖNETİCİ PANEL
+function panelToggle() {
+  const p = document.getElementById("yoneticiPanel");
+  p.style.display = p.style.display === "none" || p.style.display === "" ? "block" : "none";
+}
 
+// ODA LİSTESİ
 async function odalariYukle() {
-  const { data } = await sb.from("rooms").select("id,name,password,created_at").order("created_at", {ascending: false});
+  const { data } = await sb.from("rooms").select("id,name,password,max_users,created_at").order("created_at", {ascending: false});
   tumOdalar = data || [];
   odalariGoster(tumOdalar);
 }
@@ -220,7 +240,8 @@ function odalariGoster(odalar) {
   odalar.forEach(oda => {
     const div = document.createElement("div");
     div.className = "oda-item";
-    div.innerHTML = `<div><div class="oda-adi">${safe(oda.name)}</div><div class="oda-info">${oda.password ? "🔒 Şifreli" : "🔓 Açık"}</div></div><div style="font-size:20px">${oda.password ? "🔑" : "➡️"}</div>`;
+    const limitBilgi = oda.max_users ? `👥 Maks ${oda.max_users}` : "";
+    div.innerHTML = `<div><div class="oda-adi">${safe(oda.name)}</div><div class="oda-info"><span>${oda.password ? "🔒 Şifreli" : "🔓 Açık"}</span>${limitBilgi ? `<span>${limitBilgi}</span>` : ""}</div></div><div style="font-size:20px">${oda.password ? "🔑" : "➡️"}</div>`;
     div.onclick = () => odayaTikla(oda);
     liste.appendChild(div);
   });
@@ -228,10 +249,10 @@ function odalariGoster(odalar) {
 
 function odalariFiltrele() {
   const q = document.getElementById("odaArama").value.toLowerCase();
-  const filtrelenen = tumOdalar.filter(o => o.name.toLowerCase().includes(q));
-  odalariGoster(filtrelenen);
+  odalariGoster(tumOdalar.filter(o => o.name.toLowerCase().includes(q)));
 }
 
+// ODA GİRİŞ
 function odayaTikla(oda) {
   aktifOda = oda;
   if (oda.password) {
@@ -248,18 +269,31 @@ function odayaTikla(oda) {
   }
 }
 
-function sifreDogrula() {
+async function sifreDogrula() {
   const sifre = document.getElementById("sifreGir").value.trim();
   const isim = document.getElementById("sifreIsim").value.trim();
   if (!isim) { hata("sifreErr", "Takma isim gir!"); return; }
   if (sifre !== aktifOda.password) { hata("sifreErr", "Şifre yanlış!"); return; }
+  const limitHata = await limitKontrol(aktifOda);
+  if (limitHata) { hata("sifreErr", limitHata); return; }
   aktifIsim = isim; sohbeteGir();
 }
 
-function isimleGir() {
+async function isimleGir() {
   const isim = document.getElementById("isimGir").value.trim();
   if (!isim) { hata("isimErr", "Takma isim gir!"); return; }
+  const limitHata = await limitKontrol(aktifOda);
+  if (limitHata) { hata("isimErr", limitHata); return; }
   aktifIsim = isim; sohbeteGir();
+}
+
+async function limitKontrol(oda) {
+  if (!oda.max_users) return null;
+  const sinir = new Date(Date.now() - 30000).toISOString();
+  const { data } = await sb.from("presence").select("id").eq("room_id", oda.id).gte("last_seen", sinir);
+  const sayi = (data || []).length;
+  if (sayi >= oda.max_users) return `Bu oda dolu! (${sayi}/${oda.max_users} kişi)`;
+  return null;
 }
 
 async function sohbeteGir() {
@@ -269,9 +303,12 @@ async function sohbeteGir() {
   document.getElementById("chatOdaAdi").textContent = "# " + aktifOda.name;
   document.getElementById("chatIsimGoster").textContent = aktifIsim;
   document.getElementById("mesajlar").innerHTML = "";
-  gizle("yoneticiPanel"); goster("yoneticiGiris");
-  hataGizle("yoneticiErr");
+  gizle("yoneticiPanel");
+  document.getElementById("yoneticiGiris").style.display = "block";
+  document.getElementById("yoneticiOnaylandi").style.display = "none";
   document.getElementById("yoneticiKeyGir").value = "";
+  hataGizle("yoneticiErr");
+  alintiTemizle();
   durum("Yükleniyor...");
   await presenceGir();
   await mesajlariYukle();
@@ -281,6 +318,7 @@ async function sohbeteGir() {
   document.getElementById("mesajIn").focus();
 }
 
+// PRESENCE
 async function presenceGir() {
   if (presenceId) { await sb.from("presence").delete().eq("id", presenceId); presenceId = null; }
   const { data } = await sb.from("presence").insert([{ room_id: aktifOda.id, name: aktifIsim }]).select().single();
@@ -293,14 +331,15 @@ async function presenceYenile() {
 async function presenceCik() {
   if (presenceId) { await sb.from("presence").delete().eq("id", presenceId); presenceId = null; }
 }
-
 async function onlineGuncelle() {
   const sinir = new Date(Date.now() - 30000).toISOString();
   const { data } = await sb.from("presence").select("name").eq("room_id", aktifOda.id).gte("last_seen", sinir);
   onlineKisiler = (data || []).map(p => p.name);
-  document.getElementById("onlineOzet").textContent = onlineKisiler.length + " çevrimiçi";
+  const max = aktifOda.max_users ? `/${aktifOda.max_users}` : "";
+  document.getElementById("onlineOzet").textContent = onlineKisiler.length + max + " çevrimiçi";
 }
 
+// MESAJLAR
 async function mesajlariYukle() {
   const { data, error } = await sb.from("messages").select("*").eq("room", aktifOda.id).order("created_at", {ascending: true});
   if (error) { durum("Hata!"); return; }
@@ -311,8 +350,16 @@ async function mesajlariYukle() {
       const div = document.createElement("div");
       div.className = "msg" + (m.name === aktifIsim ? " benim" : "");
       div.dataset.id = m.id;
+      div.dataset.isim = m.name;
+      div.dataset.mesaj = m.message;
       const saat = new Date(m.created_at).toLocaleTimeString("tr-TR", {hour:"2-digit",minute:"2-digit"});
-      div.innerHTML = `<div class="isim">${safe(m.name)} <span class="saat">${saat}</span></div><div class="icerik">${safe(m.message)}</div>`;
+      const alintiBlok = m.reply_to ? `<div class="alinti-blok">↩️ ${safe(m.reply_to)}</div>` : "";
+      div.innerHTML = `
+        <div class="isim">${safe(m.name)} <span class="saat">${saat}</span>
+          <span class="alinti-btn" onclick="alintiYap(this)">↩️</span>
+        </div>
+        ${alintiBlok}
+        <div class="icerik">${safe(m.message)}</div>`;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     }
@@ -320,24 +367,39 @@ async function mesajlariYukle() {
   durum("✓ Aktif");
 }
 
+// ALINTI
+function alintiYap(btn) {
+  const msg = btn.closest(".msg");
+  const isim = msg.dataset.isim;
+  const metin = msg.dataset.mesaj;
+  alintiMsg = { isim, metin };
+  document.getElementById("alintiOnizlemeMetin").textContent = isim + ": " + metin;
+  gosterflex("alintiOnizleme");
+  document.getElementById("mesajIn").focus();
+}
+function alintiTemizle() {
+  alintiMsg = null;
+  gizle("alintiOnizleme");
+}
+
+// GÖNDER
 async function gonder() {
   const text = document.getElementById("mesajIn").value.trim();
   if (!text) return;
   hataGizle("chatErr");
   document.getElementById("gonderBtn").disabled = true;
   document.getElementById("mesajIn").value = "";
-  const { error } = await sb.from("messages").insert([{ room: aktifOda.id, name: aktifIsim, message: text }]);
+  const mesajData = { room: aktifOda.id, name: aktifIsim, message: text };
+  if (alintiMsg) mesajData.reply_to = alintiMsg.isim + ": " + alintiMsg.metin.substring(0, 60);
+  alintiTemizle();
+  const { error } = await sb.from("messages").insert([mesajData]);
   document.getElementById("gonderBtn").disabled = false;
   if (error) { document.getElementById("mesajIn").value = text; hata("chatErr", "Gönderilemedi: " + error.message); }
   else await mesajlariYukle();
   document.getElementById("mesajIn").focus();
 }
 
-function panelToggle() {
-  const p = document.getElementById("yoneticiPanel");
-  p.style.display = p.style.display === "none" ? "block" : "none";
-}
-
+// YÖNETİCİ
 async function yoneticiDogrula() {
   const key = document.getElementById("yoneticiKeyGir").value.trim();
   if (!key) return;
@@ -357,6 +419,7 @@ async function odaSil() {
   cik();
 }
 
+// YENİ ODA
 function yeniOdaGoster() { goster("yeniOdaForm"); }
 function yeniOdaGizle() { gizle("yeniOdaForm"); }
 
@@ -365,17 +428,25 @@ async function odaOlustur() {
   const sifre = document.getElementById("yeniSifre").value.trim();
   const yKey = document.getElementById("yeniYoneticiKey").value.trim();
   const isim = document.getElementById("yeniIsim").value.trim();
+  const maxU = document.getElementById("yeniMaxUser").value;
   if (!ad || !isim) { hata("yeniErr", "Oda adı ve takma isim zorunlu!"); return; }
   if (!yKey) { hata("yeniErr", "Yönetici anahtarı belirle!"); return; }
   hataGizle("yeniErr");
-  const { data, error } = await sb.from("rooms").insert([{ name: ad, password: sifre || null, owner_key: yKey }]).select().single();
+  const { data, error } = await sb.from("rooms").insert([{
+    name: ad, password: sifre || null, owner_key: yKey,
+    max_users: maxU ? parseInt(maxU) : 50
+  }]).select().single();
   if (error) { hata("yeniErr", "Hata: " + error.message); return; }
   aktifOda = data; aktifIsim = isim;
   yeniOdaGizle(); gizle("anaSayfa");
   await sohbeteGir();
-  yoneticiMi = true; gizle("yoneticiGiris"); goster("yoneticiPanel");
+  yoneticiMi = true;
+  goster("yoneticiPanel");
+  document.getElementById("yoneticiGiris").style.display = "none";
+  document.getElementById("yoneticiOnaylandi").style.display = "block";
 }
 
+// ÇIKIŞ
 async function cik() {
   clearInterval(timer); clearInterval(presenceTimer);
   timer = null; presenceTimer = null;
@@ -385,7 +456,6 @@ async function cik() {
   gizle("chatSayfasi"); gizle("onlinePopup");
   goster("anaSayfa"); odalariYukle();
 }
-
 function anaSayfayaDon() { gizle("sifreSayfasi"); gizle("isimSayfasi"); goster("anaSayfa"); }
 
 window.addEventListener("beforeunload", () => {
