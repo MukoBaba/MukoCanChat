@@ -45,7 +45,7 @@
     .ara-input::placeholder { color: #2a1e42; }
 
     /* ---- KVKK ---- */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
     .kvkk-box { background: #12101e; border: 1px solid #1e1a32; border-radius: 20px; padding: 24px; max-width: 420px; width: 100%; }
     .kvkk-title { font-size: 16px; font-weight: 700; color: #a78bfa; margin-bottom: 12px; }
     .kvkk-text { font-size: 13px; color: #4a3a6a; line-height: 1.65; max-height: 190px; overflow-y: auto; background: #0c0c14; border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid #1e1a32; }
@@ -155,7 +155,7 @@
     .ilet-iptal { padding: 9px 14px; border-radius: 10px; border: 1.5px solid #1e1a32; background: transparent; color: #3d2d5a; font-size: 13px; cursor: pointer; font-family: inherit; }
 
     /* Versiyon */
-    .ver { position: fixed; bottom: 5px; right: 8px; font-size: 10px; color: #1e1a32; z-index: 1; pointer-events: none; }
+    .ver { position: fixed; top: 5px; right: 8px; font-size: 13px; color: #a78bfa; z-index: 1; pointer-events: none; font-weight:700; }
 
     /* ===== ANİMASYONLAR ===== */
 
@@ -367,7 +367,7 @@
     .dm-gonder { width: 40px; height: 40px; border-radius: 50%; border: none; background: linear-gradient(135deg,#6d28d9,#7c3aed); color: #fff; font-size: 16px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
     /* ===== ALT NAV ===== */
-    .alt-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #12101e; border-top: 1px solid #1e1a32; display: flex; z-index: 100; max-width: 460px; margin: 0 auto; }
+    .alt-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #12101e; border-top: 1px solid #1e1a32; display: flex; z-index: 50; max-width: 460px; margin: 0 auto; }
     .alt-nav-btn { flex: 1; padding: 12px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; color: #3d2d5a; font-size: 11px; font-weight: 600; transition: all 0.2s; border: none; background: none; font-family: inherit; }
     .alt-nav-btn.aktif { color: #a78bfa; }
     .alt-nav-btn .nav-icon { font-size: 22px; }
@@ -429,6 +429,8 @@
       <input id="girisSifre" type="password" placeholder="Şifren" />
       <button class="btn" onclick="girisYap()">Giriş Yap</button>
       <div style="text-align:center;margin-top:8px"><span onclick="authTab('unuttum')" style="font-size:12px;color:#4a3a6a;cursor:pointer;text-decoration:underline">Şifremi unuttum</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><div style="flex:1;height:1px;background:#1e1a32"></div><span style="font-size:11px;color:#2a1e42">veya</span><div style="flex:1;height:1px;background:#1e1a32"></div></div>
+      <button class="btn" onclick="googleGiris()" style="background:#fff;color:#222;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google ile Giriş Yap</button>
       <div class="err" id="girisErr"></div>
     </div>
     <!-- Kayıt -->
@@ -441,7 +443,9 @@
       <input id="kayitSifre" type="password" placeholder="Şifren" />
       <span class="label">Şifreyi tekrarla</span>
       <input id="kayitSifre2" type="password" placeholder="Şifreni tekrar yaz" />
-      <button class="btn" style="position:relative;z-index:999" onclick="alert('test');kayitOl()">Kayıt Ol</button>
+      <button class="btn" onclick="kayitOl()">Kayıt Ol</button>
+      <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><div style="flex:1;height:1px;background:#1e1a32"></div><span style="font-size:11px;color:#2a1e42">veya</span><div style="flex:1;height:1px;background:#1e1a32"></div></div>
+      <button class="btn" onclick="googleGiris()" style="background:#fff;color:#222;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google ile Devam Et</button>
       <div class="err" id="kayitErr"></div>
     </div>
     <!-- OTP Doğrulama -->
@@ -728,7 +732,7 @@
   </div>
 </div>
 
-<div class="ver">v6.7</div>
+<div class="ver">v7.5</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -810,6 +814,36 @@ function setirChatYukseklik(){
 function kvkkKontrol(){const ok=el("kvkkCb").checked;el("kvkkBtn").disabled=!ok;el("kvkkBtn").style.opacity=ok?"1":"0.3";}
 function kvkkKabul(){localStorage.setItem("kvkk","1");gizle("kvkkOverlay");}
 if(localStorage.getItem("kvkk")==="1")gizle("kvkkOverlay");
+
+// Google ile giriş sonrası otomatik işlem
+sb.auth.onAuthStateChange(async (event, session) => {
+  if(event === "SIGNED_IN" && session && !aktifHesap){
+    const user = session.user;
+    // users tablosunda var mı?
+    const {data:mevcut} = await sb.from("users").select("id,username,email,created_at").eq("id", user.id).single();
+    if(mevcut){
+      aktifHesap = {id:mevcut.id, username:mevcut.username, email:mevcut.email, created_at:mevcut.created_at};
+      localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
+      authGuncelle(); authKapat();
+    } else {
+      // Yeni Google kullanıcısı - kullanıcı adı sor
+      const ad = prompt("Kullanıcı adın ne olsun? (en az 3 karakter)");
+      if(!ad || ad.length < 3){ await sb.auth.signOut(); return; }
+      const {data:yeni} = await sb.from("users").insert([{id:user.id, username:ad, email:user.email}]).select().single();
+      if(yeni){
+        aktifHesap = {id:yeni.id, username:ad, email:user.email, created_at:yeni.created_at};
+        localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
+        authGuncelle(); authKapat();
+        alert("Hoş geldin, "+ad+"! ✅");
+      }
+    }
+  }
+  if(event === "SIGNED_OUT"){
+    aktifHesap = null;
+    localStorage.removeItem("mukoChatHesap");
+    authGuncelle();
+  }
+});
 
 // POPUP
 function popupAc(){
@@ -1551,8 +1585,8 @@ function authGuncelle(){
   if(girisli){ dmArkadasListeYukle(); dmIstekKontrol(); }
 }
 
-function authAc(){ goster("authOverlay"); authTab("giris"); }
-function authKapat(){ gizle("authOverlay"); }
+function authAc(){ goster("authOverlay"); authTab("giris"); el("altNav").style.display="none"; }
+function authKapat(){ gizle("authOverlay"); el("altNav").style.display="flex"; }
 function authTab(t){
   el("girisForm").style.display="none";
   el("kayitForm").style.display="none";
@@ -1574,66 +1608,71 @@ function authTab(t){
   }
 }
 
+let bekleyenEmail = null;
+let bekleyenKayit = null;
+
+async function googleGiris(){
+  const {error} = await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: "https://mukobaba.github.io" }
+  });
+  if(error) alert("Google hata: "+error.message);
+}
+
 async function girisYap(){
   const ad = el("girisAd").value.trim();
   const sifre = el("girisSifre").value;
-  if(!ad||!sifre){ el("girisErr").textContent="Tüm alanları doldur!"; return; }
-  el("girisErr").textContent="Giriş yapılıyor...";
-  // Kullanıcı adından e-postayı bul
-  const {data:user} = await sb.from("users").select("email,id,username,created_at").eq("username",ad).single();
-  if(!user){ el("girisErr").textContent="Kullanıcı bulunamadı!"; return; }
-  const {data:authData, error:authError} = await sb.auth.signInWithPassword({email:user.email, password:sifre});
-  if(authError){
-    if(authError.message.includes("Email not confirmed")){
-      el("girisErr").textContent="❌ E-postanı doğrulamamışsın! Gelen kutunu kontrol et.";
+  const err = el("girisErr");
+  err.style.color = "#f87171";
+  if(!ad || !sifre){ err.textContent = "Tüm alanları doldur!"; return; }
+  err.style.color = "#a78bfa";
+  err.textContent = "Giriş yapılıyor...";
+  const {data:kullanici} = await sb.from("users").select("id,username,email,created_at").eq("username", ad).single();
+  if(!kullanici){ err.style.color="#f87171"; err.textContent = "Kullanıcı bulunamadı!"; return; }
+  const {data:session, error:loginErr} = await sb.auth.signInWithPassword({email: kullanici.email, password: sifre});
+  if(loginErr){
+    err.style.color="#f87171";
+    if(loginErr.message.includes("Email not confirmed")){
+      err.textContent = "❌ E-postanı doğrulamamışsın! Gelen kutunu kontrol et.";
     } else {
-      el("girisErr").textContent="Şifre hatalı!";
+      err.textContent = "Şifre hatalı!";
     }
     return;
   }
-  aktifHesap = {id:user.id, username:user.username, email:user.email, created_at:user.created_at};
+  aktifHesap = {id: kullanici.id, username: kullanici.username, email: kullanici.email, created_at: kullanici.created_at};
   localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
-  authGuncelle(); authKapat();
-  el("girisErr").textContent="";
+  err.textContent = "";
+  authGuncelle();
+  authKapat();
 }
 
 async function kayitOl(){
-  try{
   const ad = el("kayitAd").value.trim();
   const email = el("kayitEmail").value.trim().toLowerCase();
   const s1 = el("kayitSifre").value;
   const s2 = el("kayitSifre2").value;
-  if(!ad||!email||!s1||!s2){ el("kayitErr").textContent="Tüm alanları doldur!"; return; }
-  if(ad.length < 3){ el("kayitErr").textContent="Kullanıcı adı en az 3 karakter olmalı!"; return; }
-  if(!email.includes("@")){ el("kayitErr").textContent="Geçerli bir e-posta gir!"; return; }
-  if(s1.length < 6){ el("kayitErr").textContent="Şifre en az 6 karakter olmalı!"; return; }
-  if(s1!==s2){ el("kayitErr").textContent="Şifreler eşleşmiyor!"; return; }
-  el("kayitErr").textContent="Adım 1: Kullanıcı adı kontrol...";
-  // Kullanıcı adı kontrolü
-  const {data:mevcutlar} = await sb.from("users").select("id").eq("username",ad);
-  if(mevcutlar && mevcutlar.length>0){ el("kayitErr").textContent="Bu kullanıcı adı alınmış! ❌"; return; }
-  el("kayitErr").textContent="Adım 2: E-posta kontrol...";
-  // E-posta kontrolü
-  const {data:emailMevcut} = await sb.from("users").select("id").eq("email",email);
-  if(emailMevcut && emailMevcut.length>0){ el("kayitErr").textContent="Bu e-posta zaten kayıtlı! ❌"; return; }
-  el("kayitErr").textContent="";
-  // Supabase Auth ile kayıt
-  el("kayitErr").textContent="Adım 3: Auth kayıt...";
-  const {data:authData, error:authError} = await sb.auth.signUp({email, password:s1});
-  if(authError){ el("kayitErr").textContent="Auth hatası: "+authError.message; return; }
-  if(!authData||!authData.user){ el("kayitErr").textContent="Kayıt hatası: kullanıcı oluşturulamadı!"; return; }
-  el("kayitErr").textContent="Adım 4: DB kaydı...";
-  const {data,error} = await sb.from("users").insert([{id:authData.user.id, username:ad, email}]).select().single();
-  if(error||!data){
-    // Auth'tan da sil
-    el("kayitErr").textContent="DB hatası: "+(error?.message||"Bilinmeyen hata");
-    return;
-  }
-  // OTP formuna geç
+  const err = el("kayitErr");
+  err.style.color = "#f87171";
+  if(!ad || !email || !s1 || !s2){ err.textContent = "Tüm alanları doldur!"; return; }
+  if(ad.length < 3){ err.textContent = "Kullanıcı adı en az 3 karakter olmalı!"; return; }
+  if(!email.includes("@") || !email.includes(".")){ err.textContent = "Geçerli bir e-posta gir!"; return; }
+  if(s1.length < 6){ err.textContent = "Şifre en az 6 karakter olmalı!"; return; }
+  if(s1 !== s2){ err.textContent = "Şifreler eşleşmiyor!"; return; }
+  err.style.color = "#a78bfa";
+  err.textContent = "Kullanıcı adı kontrol ediliyor...";
+  const {data:varMi} = await sb.from("users").select("id").eq("username", ad);
+  if(varMi && varMi.length > 0){ err.style.color="#f87171"; err.textContent = "Bu kullanıcı adı alınmış! ❌"; return; }
+  const {data:emailVarMi} = await sb.from("users").select("id").eq("email", email);
+  if(emailVarMi && emailVarMi.length > 0){ err.style.color="#f87171"; err.textContent = "Bu e-posta zaten kayıtlı! ❌"; return; }
+  err.textContent = "Hesap oluşturuluyor...";
+  const {data:auth, error:authErr} = await sb.auth.signUp({email:email, password:s1});
+  if(authErr){ err.style.color="#f87171"; err.textContent = "Hata: " + authErr.message; return; }
+  if(!auth || !auth.user){ err.style.color="#f87171"; err.textContent = "Kayıt başarısız, tekrar dene!"; return; }
   bekleyenEmail = email;
-  bekleyenKayit = {id:authData.user.id, username:ad, email, created_at:data.created_at};
+  bekleyenKayit = {id: auth.user.id, username: ad, email: email};
+  err.style.color="#34d399";
+  err.textContent = "✅ Kod e-postana gönderildi!";
   authTab("otp");
-  }catch(err){ el("kayitErr").textContent="HATA: "+err.message; console.error(err); }
 }
 
 async function hesapCikis(){
@@ -1659,17 +1698,19 @@ function yeniOdaKontrol(){
   yeniOdaGoster();
 }
 
-let bekleyenEmail = null;
-let bekleyenKayit = null;
 
 async function otpDogrula(){
   const kod = el("otpKod").value.trim().replace(/\s/g,"");
   if(kod.length !== 6 || !/^\d+$/.test(kod)){ el("otpErr").textContent="6 haneli sayısal kodu gir!"; return; }
   el("otpErr").textContent="Doğrulanıyor...";
-  const {error} = await sb.auth.verifyOtp({email: bekleyenEmail, token: kod, type: "signup"});
+  const {data:verifyData, error} = await sb.auth.verifyOtp({email: bekleyenEmail, token: kod, type: "signup"});
   if(error){ el("otpErr").textContent="❌ Hatalı veya süresi dolmuş kod!"; return; }
-  // Doğrulama başarılı
-  aktifHesap = bekleyenKayit;
+  // Doğrulama başarılı - şimdi users tablosuna ekle
+  el("otpErr").style.color="#a78bfa";
+  el("otpErr").textContent="Profil oluşturuluyor...";
+  const {data:yeniKullanici, error:dbErr} = await sb.from("users").insert([{id: bekleyenKayit.id, username: bekleyenKayit.username, email: bekleyenKayit.email}]).select().single();
+  if(dbErr || !yeniKullanici){ el("otpErr").style.color="#f87171"; el("otpErr").textContent="DB hatası: "+(dbErr?.message||"bilinmeyen"); return; }
+  aktifHesap = {id: yeniKullanici.id, username: yeniKullanici.username, email: yeniKullanici.email, created_at: yeniKullanici.created_at};
   localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
   bekleyenEmail=null; bekleyenKayit=null;
   authGuncelle(); authKapat();
