@@ -806,6 +806,11 @@
       <span style="font-size:13px;color:#4a3a6a">Önizleme: </span>
       <span id="yaziBoyutuOnizleme" style="color:#e2d9f3">Merhaba! Bu bir test mesajıdır.</span>
     </div>
+    <div style="border-top:1px solid #1e1a32;margin:16px 0 12px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:13px;color:#e2d9f3">🔔 Bildirimler</span>
+      <button id="bildirimToggleBtn" onclick="bildirimToggleAyar()" style="padding:6px 16px;border-radius:20px;border:1.5px solid #3b1f6e;background:#1e1a32;color:#a78bfa;font-size:12px;cursor:pointer;font-family:inherit">Yükleniyor...</button>
+    </div>
     <button class="btn" onclick="yaziBoyutuKaydet()">💾 Kaydet</button>
     <button class="btn btn-gray" onclick="yaziBoyutuKapat()" style="margin-top:6px">Kapat</button>
   </div>
@@ -851,6 +856,7 @@ if(localStorage.getItem("kvkk")==="1"){document.getElementById("kvkkOverlay").st
 <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-messaging.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app-check.js"></script>
 <script>
 // ===== FİREBASE BAŞLAT =====
@@ -866,6 +872,11 @@ firebase.initializeApp({
 const appCheck = firebase.appCheck();
 appCheck.activate("6Lceb4ksAAAAAPhDpStmR9tBAn8sUvc8pDsKoEN2", true);
 const auth = firebase.auth();
+let _fcmMessaging = null;
+try{
+  _fcmMessaging = firebase.messaging();
+  _fcmMessaging.usePublicVapidKey("BJ8GcRkuXJ21DnWIBRAaVIMrBTA9Zrc6P8HhPTEnOe0WIVqWT04fJubXFjDYWDJh7HD5Rb_zS9Hgfe84It1ud5I");
+}catch(e){console.log("FCM init error:", e);}
 const db = firebase.firestore();
 db.settings({ experimentalForceLongPolling: true, merge: true });
 
@@ -997,6 +1008,31 @@ async function dogrulamaCikis(){
   el("dogrulamaOverlay").style.display="none";
   el("altNav").style.display="flex";
   aktifHesap=null;authGuncelle();
+}
+
+async function bildirimIzniAl(){
+  if(!_fcmMessaging||!aktifHesap)return;
+  try{
+    const izin = await Notification.requestPermission();
+    if(izin!=="granted")return;
+    const token = await _fcmMessaging.getToken();
+    if(token){
+      await db.collection("users").doc(aktifHesap.id).update({fcmToken:token});
+    }
+    _fcmMessaging.onMessage((payload)=>{
+      const title=payload.notification?.title||"Yeni mesaj";
+      const body=payload.notification?.body||"";
+      // Show in-app notification
+      const bar=el("baglantiBar");
+      bar.textContent="🔔 "+title+": "+body;
+      bar.className="baglanti-bar online";
+      bar.style.display="block";
+      bar.style.animation="none";
+      setTimeout(()=>bar.style.animation="slideFromTop 0.5s cubic-bezier(0.2,0.8,0.4,1)",10);
+      if(baglantiGizleTimer)clearTimeout(baglantiGizleTimer);
+      baglantiGizleTimer=setTimeout(()=>{bar.style.display="none";},4000);
+    });
+  }catch(e){console.log("FCM token error:",e);}
 }
 async function tekrarGonder(){
   const email=el("authEmail").value.trim(),sifre=el("authSifre").value;
@@ -1949,9 +1985,28 @@ function yaziBoyutuUygula(){
   if(el("yaziBoyutuGoster"))el("yaziBoyutuGoster").textContent=_yaziBoyutu;
   if(el("yaziBoyutuOnizleme"))el("yaziBoyutuOnizleme").style.fontSize=_yaziBoyutu+"px";
 }
+function bildirimDurumGoster(){
+  const btn=el("bildirimToggleBtn");
+  if(!btn)return;
+  if(!("Notification" in window)){btn.textContent="Desteklenmiyor";btn.disabled=true;return;}
+  if(Notification.permission==="granted"){btn.textContent="✅ Açık — Kapat";btn.style.background="#0f2e1c";btn.style.color="#34d399";btn.style.borderColor="#0f2e1c";}
+  else if(Notification.permission==="denied"){btn.textContent="🚫 Engellendi";btn.disabled=true;btn.style.color="#f87171";}
+  else{btn.textContent="🔔 İzin Ver";btn.style.background="#1e1a32";btn.style.color="#a78bfa";}
+}
+async function bildirimToggleAyar(){
+  if(!("Notification" in window))return;
+  if(Notification.permission==="granted"){
+    // Can't revoke programmatically, guide user
+    alert("Bildirimleri kapatmak için tarayıcı ayarlarından bu siteyi bulup bildirimleri engelle.");
+    return;
+  }
+  await bildirimIzniAl();
+  bildirimDurumGoster();
+}
 function yaziBoyutuAc(){
   el("yaziBoyutuOverlay").style.display="flex";
   yaziBoyutuUygula();
+  bildirimDurumGoster();
 }
 function yaziBoyutuKapat(){el("yaziBoyutuOverlay").style.display="none";}
 function yaziBoyutuKaydet(){localStorage.setItem("yaziBoyutu",_yaziBoyutu);yaziBoyutuKapat();alert("Yazı boyutu kaydedildi! ✅");}
