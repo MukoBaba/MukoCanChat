@@ -470,6 +470,10 @@
     <input id="authSifre" autocomplete="current-password" type="password" placeholder="Şifre (en az 6 karakter)" style="margin-bottom:8px" />
     <input id="authSifre2" type="password" placeholder="Şifreyi tekrar gir" style="margin-bottom:8px;display:none" />
     <input id="authIsim" type="text" placeholder="Kullanıcı adı (en az 3 karakter)" maxlength="20" autocomplete="off" style="margin-bottom:8px;display:none" />
+    <div id="kodAlanWrap" style="display:none">
+      <div style="font-size:12px;color:#a78bfa;margin-bottom:6px;text-align:center">📧 E-postana kod gönderildi, gir:</div>
+      <input id="authKodInput" type="number" placeholder="6 haneli kod" style="text-align:center;font-size:20px;letter-spacing:4px;margin-bottom:8px" />
+    </div>
     <div class="err" id="authErr"></div>
     <button class="btn" id="authSubmitBtn" onclick="authSubmit()" style="margin-top:0">Giriş Yap</button>
 
@@ -757,7 +761,7 @@
   </div>
 </div>
 
-<div class="ver">v13.6</div>
+<div class="ver">v13.7</div>
 
 <!-- DOĞRULAMA KODU -->
 <div class="overlay" id="dogrulamaOverlay" style="display:none">
@@ -977,7 +981,10 @@ async function emailGiris(){
   }
   catch(e){hata("authErr","Hata: "+e.message);}
 }
+let _kayitKod=null, _kayitEmail=null, _kayitSifre=null, _kayitIsim=null, _kayitAsamasi=false;
+
 async function emailKayit(){
+  if(_kayitAsamasi){ await emailKayitKodDogrula(); return; }
   const email=el("authEmail").value.trim();
   const sifre=el("authSifre").value;
   const sifre2=el("authSifre2").value;
@@ -989,17 +996,44 @@ async function emailKayit(){
   hata("authErr","Kontrol ediliyor...");
   const snap=await db.collection("users").where("username","==",isim).get();
   if(!snap.empty){hata("authErr","Bu kullanıcı adı alınmış! ❌");return;}
-  hata("authErr","Kayıt olunuyor...");
+  // Kod gönder
+  _kayitKod=Math.floor(100000+Math.random()*900000).toString();
+  _kayitEmail=email; _kayitSifre=sifre; _kayitIsim=isim;
+  hata("authErr","Kod gönderiliyor...");
   try{
-    const cred=await auth.createUserWithEmailAndPassword(email,sifre);
+    const now=new Date();
+    await emailjs.send("service_cyjyoo6","template_2b35i4g",{
+      to_email:email, to_name:isim, passcode:_kayitKod,
+      time:now.toLocaleTimeString("tr-TR")+", "+now.toLocaleDateString("tr-TR")
+    });
+    _kayitAsamasi=true;
+    el("kodAlanWrap").style.display="block";
+    el("authEmail").disabled=true;
+    el("authSifre").disabled=true;
+    el("authSifre2").disabled=true;
+    el("authIsim").disabled=true;
+    el("authSubmitBtn").textContent="✅ Kodu Doğrula";
+    hata("authErr","✉️ "+email+" adresine kod gönderildi!");
+  }catch(e){hata("authErr","E-posta gönderilemedi: "+e.text);}
+}
+
+async function emailKayitKodDogrula(){
+  const girilen=el("authKodInput").value.trim();
+  if(!girilen){hata("authErr","Kodu gir!");return;}
+  if(girilen!==_kayitKod){hata("authErr","❌ Yanlış kod! Tekrar dene.");return;}
+  hata("authErr","Hesap oluşturuluyor...");
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(_kayitEmail,_kayitSifre);
     const kisaId="#"+cred.user.uid.substring(0,6).toUpperCase();
     await db.collection("users").doc(cred.user.uid).set({
-      username:isim,email:email,kisaId:kisaId,createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      username:_kayitIsim,email:_kayitEmail,kisaId:kisaId,createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
-    authKapat();
-    dogrulamaAc(email, isim);
-  }
-  catch(e){hata("authErr","Hata: "+e.message);}
+    aktifHesap={id:cred.user.uid,username:_kayitIsim,email:_kayitEmail,kisaId:kisaId,created_at:new Date().toISOString()};
+    localStorage.setItem("mukoChatHesap",JSON.stringify(aktifHesap));
+    _kayitAsamasi=false; _kayitKod=null;
+    authKapat(); authGuncelle();
+    alert("Hoş geldin, "+_kayitIsim+"! ✅");
+  }catch(e){hata("authErr","Hata: "+e.message);}
 }
 async function googleGiris(){
   try{await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());}
