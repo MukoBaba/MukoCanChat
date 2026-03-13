@@ -386,6 +386,7 @@
     .alt-nav-divider { width: 1px; background: #1e1a32; margin: 8px 0; }
     body { padding-bottom: 60px; }
   </style>
+
 </head>
 <body>
 
@@ -395,7 +396,7 @@
     <div class="kvkk-title">🔒 Gizlilik & Kullanım Koşulları</div>
     <div class="kvkk-text">
       <b>MukoCan Chat Aydınlatma Metni</b><br><br>
-      Bu platformu kullanırken yazdığınız mesajlar ve seçtiğiniz takma isim <b>Supabase</b> altyapısında saklanmaktadır. Veriler yalnızca sohbet işlevini yerine getirmek amacıyla kullanılmakta olup üçüncü taraflarla paylaşılmamaktadır.<br><br>
+      Bu platformu kullanırken yazdığınız mesajlar ve seçtiğiniz takma isim <b>Firebase</b> altyapısında saklanmaktadır. Veriler yalnızca sohbet işlevini yerine getirmek amacıyla kullanılmakta olup üçüncü taraflarla paylaşılmamaktadır.<br><br>
       <b>Saklanan veriler:</b> Takma isim, mesajlar, mesaj tarihi/saati, geçici çevrimiçi durum.<br><br>
       <b>Önemli:</b> Gerçek adınızı veya kişisel bilgilerinizi yazmayınız. Bu platform 13 yaş ve üzeri kullanıcılara yöneliktir.<br><br>
       6698 sayılı KVKK kapsamında bilgilendirilmiş olduğunuzu kabul edersiniz.
@@ -434,6 +435,12 @@
       <div style="font-size:16px;font-weight:700;color:#e8e0f0;margin-top:6px">MukoCan Chat</div>
       <div style="font-size:12px;color:#4a3a6a;margin-top:4px">Giriş yapmak için Google hesabını kullan</div>
     </div>
+    <input id="authEmail" type="email" placeholder="E-posta" style="margin-bottom:8px" />
+    <input id="authSifre" type="password" placeholder="Şifre (en az 6 karakter)" style="margin-bottom:8px" />
+    <div class="err" id="authErr"></div>
+    <button class="btn" onclick="emailGiris()" style="margin-top:0">Giriş Yap</button>
+    <button class="btn" onclick="emailKayit()" style="margin-top:6px;background:#1e1a32;border:1.5px solid #3b1f6e;color:#a78bfa">Kayıt Ol</button>
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><div style="flex:1;height:1px;background:#1e1a32"></div><span style="font-size:11px;color:#2a1e42">veya</span><div style="flex:1;height:1px;background:#1e1a32"></div></div>
     <button class="btn" onclick="googleGiris()" style="background:#fff;color:#222;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Google ile Giriş Yap
@@ -721,9 +728,8 @@
   </div>
 </div>
 
-<div class="ver">v9.8</div>
+<div class="ver">v10.0</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
 <div class="alt-nav" id="altNav" style="display:none">
   <button class="alt-nav-btn" id="navDm" onclick="navGit('dm')">
@@ -738,14 +744,25 @@
 </div>
 
 <script>
-const SB_URL = "https://zxlbfzfccbdciqdmqmsy.supabase.co";
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bGJmemZjY2JkY2lxZG1xbXN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTg4NDUsImV4cCI6MjA4ODgzNDg0NX0.4QmR0PGik--bMaSL7LugNAgxZsyzgFOiuXxh8B8V9FM";
-const sb = window.supabase.createClient(SB_URL, SB_KEY);
-
-let aktifOda=null, aktifIsim="", yoneticiMi=false;
-let timer=null, presTimer=null, presenceId=null, realtimeChannel=null;
-let onlineKisiler=[], tumOdalar=[], alintiMsg=null;
-let bildirimAcik=false, sonMesajId=null;
+function kvkkKontrol(){var ok=document.getElementById("kvkkCb").checked;var btn=document.getElementById("kvkkBtn");btn.disabled=!ok;btn.style.opacity=ok?"1":"0.3";}
+function kvkkKabul(){localStorage.setItem("kvkk","1");document.getElementById("kvkkOverlay").style.display="none";}
+if(localStorage.getItem("kvkk")==="1"){document.getElementById("kvkkOverlay").style.display="none";}
+</script>
+<script src="https://unpkg.com/firebase@9.22.2/compat/app.js"></script>
+<script src="https://unpkg.com/firebase@9.22.2/compat/auth.js"></script>
+<script src="https://unpkg.com/firebase@9.22.2/compat/firestore.js"></script>
+<script>
+// ===== FİREBASE BAŞLAT =====
+firebase.initializeApp({
+  apiKey:"AIzaSyBAVovHw8u0uigBN4KJ-Bbry6muTcuSSaQ",
+  authDomain:"mukocan-chat-5ea03.firebaseapp.com",
+  projectId:"mukocan-chat-5ea03",
+  storageBucket:"mukocan-chat-5ea03.firebasestorage.app",
+  messagingSenderId:"716674607770",
+  appId:"1:716674607770:web:e715a7e49c76d10fedcd23"
+});
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 function safe(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML;}
 function el(id){return document.getElementById(id);}
@@ -754,120 +771,115 @@ function gizle(id){el(id).style.display="none";}
 function hata(id,msg){el(id).textContent=msg;el(id).style.display="block";}
 function hataGizle(id){el(id).style.display="none";}
 
-// Chat sayfasını flex olarak göster
+let aktifOda=null,aktifIsim="",yoneticiMi=false,aktifHesap=null;
+let timer=null,presTimer=null,presenceRef=null;
+let onlineKisiler=[],tumOdalar=[],aktifKategori="";
+let alintiMsg=null,bildirimAcik=false;
+let mesajUnsubscribe=null,dmInterval=null,aktifDmKisi=null;
+let gorulenPollId=null;
+
 function chatGoster(){
-  el("chatSayfasi").style.display="flex"; el("chatSayfasi").classList.add("aciliyor"); setTimeout(()=>el("chatSayfasi").classList.remove("aciliyor"),400);
+  el("chatSayfasi").style.display="flex";
+  el("chatSayfasi").classList.add("aciliyor");
+  setTimeout(()=>el("chatSayfasi").classList.remove("aciliyor"),400);
   setirChatYukseklik();
   if(window.visualViewport){
-    window.visualViewport.removeEventListener('resize', setirChatYukseklik);
-    window.visualViewport.removeEventListener('scroll', setirChatYukseklik);
-    window.visualViewport.addEventListener('resize', setirChatYukseklik);
-    window.visualViewport.addEventListener('scroll', setirChatYukseklik);
-  } else {
-    window.removeEventListener('resize', setirChatYukseklik);
-    window.addEventListener('resize', setirChatYukseklik);
-  }
+    window.visualViewport.addEventListener('resize',setirChatYukseklik);
+    window.visualViewport.addEventListener('scroll',setirChatYukseklik);
+  } else window.addEventListener('resize',setirChatYukseklik);
 }
 function setirChatYukseklik(){
-  const vv = window.visualViewport;
-  const h = vv ? vv.height : window.innerHeight;
-  const y = vv ? vv.offsetTop : 0;
-  const chat = el("chatSayfasi");
-  chat.style.position = "fixed";
-  chat.style.top = y + "px";
-  chat.style.left = "0";
-  chat.style.right = "0";
-  chat.style.height = h + "px";
-  chat.style.maxWidth = "460px";
-  chat.style.margin = "0 auto";
-  // Input alanını her zaman görünür yap
-  const inputArea = el("inputArea");
-  if(inputArea){
-    inputArea.style.position = "sticky";
-    inputArea.style.bottom = "0";
-  }
-  const box = el("mesajlar");
-  if(box){
-    setTimeout(()=>{
-      box.scrollTop = box.scrollHeight;
-      // Input görünür değilse scroll et
-      const input = el("mesajInput");
-      if(input && document.activeElement === input){
-        input.scrollIntoView({block:"end", behavior:"smooth"});
-      }
-    }, 80);
-  }
+  const vv=window.visualViewport;
+  const h=vv?vv.height:window.innerHeight,y=vv?vv.offsetTop:0;
+  const chat=el("chatSayfasi");
+  chat.style.position="fixed";chat.style.top=y+"px";
+  chat.style.left="0";chat.style.right="0";chat.style.height=h+"px";
+  chat.style.maxWidth="460px";chat.style.margin="0 auto";
+  const box=el("mesajlar");
+  if(box)setTimeout(()=>{box.scrollTop=box.scrollHeight;},80);
 }
 
-// KVKK
 function kvkkKontrol(){const ok=el("kvkkCb").checked;el("kvkkBtn").disabled=!ok;el("kvkkBtn").style.opacity=ok?"1":"0.3";}
 function kvkkKabul(){localStorage.setItem("kvkk","1");gizle("kvkkOverlay");}
 if(localStorage.getItem("kvkk")==="1")gizle("kvkkOverlay");
 
-// Google ile giriş sonrası otomatik işlem
-sb.auth.onAuthStateChange(async (event, session) => {
-  if(event === "SIGNED_IN" && session && !aktifHesap){
-    const user = session.user;
-    // users tablosunda var mı?
-    const {data:mevcut} = await sb.from("users").select("id,username,email,created_at").eq("id", user.id).single();
-    if(mevcut){
-      aktifHesap = {id:mevcut.id, username:mevcut.username, email:mevcut.email, created_at:mevcut.created_at};
-      localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
-      authGuncelle(); authKapat();
+function authAc(){goster("authOverlay");el("altNav").style.display="none";hataGizle("authErr");}
+function authKapat(){gizle("authOverlay");el("altNav").style.display="flex";}
+
+async function emailGiris(){
+  const email=el("authEmail").value.trim(),sifre=el("authSifre").value;
+  if(!email||!sifre){hata("authErr","E-posta ve şifre gir!");return;}
+  hata("authErr","Giriş yapılıyor...");
+  try{await auth.signInWithEmailAndPassword(email,sifre);authKapat();}
+  catch(e){hata("authErr","Hata: "+e.message);}
+}
+async function emailKayit(){
+  const email=el("authEmail").value.trim(),sifre=el("authSifre").value;
+  if(!email||!sifre){hata("authErr","E-posta ve şifre gir!");return;}
+  if(sifre.length<6){hata("authErr","Şifre en az 6 karakter!");return;}
+  hata("authErr","Kayıt olunuyor...");
+  try{await auth.createUserWithEmailAndPassword(email,sifre);}
+  catch(e){hata("authErr","Hata: "+e.message);}
+}
+async function googleGiris(){
+  try{await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}
+  catch(e){alert("Google hata: "+e.message);}
+}
+async function githubGiris(){
+  try{await auth.signInWithPopup(new firebase.auth.GithubAuthProvider());}
+  catch(e){alert("GitHub hata: "+e.message);}
+}
+async function hesapCikis(){
+  if(!confirm("Çıkış yapmak istiyor musun?"))return;
+  await auth.signOut();aktifHesap=null;localStorage.removeItem("mukoChatHesap");authGuncelle();
+}
+async function kullaniciAdiKaydet(){
+  const ad=el("kullaniciAdiInput").value.trim();
+  const err=el("kullaniciAdiErr");
+  if(!ad||ad.length<3){err.textContent="En az 3 karakter!";err.style.display="block";return;}
+  err.textContent="Kontrol ediliyor...";err.style.display="block";
+  const snap=await db.collection("users").where("username","==",ad).get();
+  if(!snap.empty){err.textContent="Bu kullanıcı adı alınmış! ❌";return;}
+  const user=auth.currentUser;
+  if(!user){err.textContent="Oturum bulunamadı!";return;}
+  await db.collection("users").doc(user.uid).set({username:ad,email:user.email||"",createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  aktifHesap={id:user.uid,username:ad,email:user.email||"",created_at:new Date().toISOString()};
+  localStorage.setItem("mukoChatHesap",JSON.stringify(aktifHesap));
+  gizle("kullaniciAdiOverlay");el("altNav").style.display="flex";authKapat();authGuncelle();
+  alert("Hoş geldin, "+ad+"! ✅");
+}
+
+auth.onAuthStateChanged(async(user)=>{
+  if(user){
+    const d=await db.collection("users").doc(user.uid).get();
+    if(d.exists){
+      const data=d.data();
+      aktifHesap={id:user.uid,username:data.username,email:data.email||"",created_at:data.createdAt?.toDate?.()?.toISOString()||new Date().toISOString()};
+      localStorage.setItem("mukoChatHesap",JSON.stringify(aktifHesap));
+      authKapat();authGuncelle();
     } else {
-      // Yeni Google kullanıcısı - kullanıcı adı overlay
-      authKapat();
-      goster("kullaniciAdiOverlay");
-      el("altNav").style.display="none";
+      authKapat();el("kullaniciAdiInput").value="";goster("kullaniciAdiOverlay");el("altNav").style.display="none";
     }
-  }
-  if(event === "SIGNED_OUT"){
-    aktifHesap = null;
-    localStorage.removeItem("mukoChatHesap");
-    authGuncelle();
+  } else {
+    aktifHesap=null;localStorage.removeItem("mukoChatHesap");authGuncelle();
   }
 });
 
-// POPUP
-function popupAc(){
-  el("popupListe").innerHTML=onlineKisiler.length===0
-    ?'<div style="color:#2a1e42;padding:8px 0;font-size:14px">Kimse yok</div>'
-    :onlineKisiler.map(n=>`<div class="popup-kisi"><span class="online-dot"></span>${safe(n)}${yoneticiMi&&n!==aktifIsim?`<button onclick="kickAc('${safe(n)}')" style="margin-left:auto;padding:3px 10px;border-radius:8px;border:none;background:#1a0505;color:#f87171;font-size:11px;cursor:pointer;font-family:inherit">At</button>`:''}</div>`).join("");
-  el("onlinePopup").style.display="flex";
-}
-function popupKapat(){gizle("onlinePopup");}
-el("onlinePopup").addEventListener("click",e=>{if(e.target===el("onlinePopup"))popupKapat();});
-
-// BİLDİRİM
-function bildirimOdaKey(){return "bil_"+(aktifOda?aktifOda.id:"");}
-async function bildirimToggle(){
-  if(!("Notification" in window)){alert("Tarayıcın bildirimleri desteklemiyor.");return;}
-  if(bildirimAcik){
-    bildirimAcik=false;localStorage.removeItem(bildirimOdaKey());
-  }else{
-    const izin=await Notification.requestPermission();
-    if(izin==="granted"){bildirimAcik=true;localStorage.setItem(bildirimOdaKey(),"1");}
-    else{alert("Bildirim izni verilmedi.");return;}
-  }
-  bildirimGuncelle();
-}
-function bildirimGuncelle(){
-  if(bildirimAcik){el("bildirimBadge").classList.add("aktif");el("bildirimYazi").textContent="Açık";}
-  else{el("bildirimBadge").classList.remove("aktif");el("bildirimYazi").textContent="Bildirim";}
-}
-function bildirimDurumYukle(){
-  bildirimAcik=localStorage.getItem(bildirimOdaKey())==="1"&&Notification.permission==="granted";
-  bildirimGuncelle();
-}
-function bildirimGonder(isim,mesaj){
-  if(!bildirimAcik||document.visibilityState==="visible")return;
-  new Notification("MukoCan Chat — #"+aktifOda.name,{body:isim+": "+mesaj,icon:"/favicon.ico"});
+function authGuncelle(){
+  const g=!!aktifHesap;
+  el("authBtn").style.display=g?"none":"";
+  el("profilBtn").style.display=g?"":"none";
+  el("cikisBtn").style.display=g?"":"none";
+  el("altNav").style.display="flex";
+  if(g){dmArkadasListeYukle();dmIstekKontrol();}
 }
 
-// ODA LİSTESİ
 async function odalariYukle(){
-  const{data}=await sb.from("rooms").select("id,name,password,max_users,duyuru_modu,konu,created_at,user_id,kategori,owner_key").order("created_at",{ascending:false});
-  tumOdalar=data||[];odalariGoster(tumOdalar);
+  try{
+    const snap=await db.collection("rooms").orderBy("createdAt","desc").get();
+    tumOdalar=snap.docs.map(d=>({id:d.id,...d.data()}));
+    odalariGoster(tumOdalar);baglantiDurumu(true);
+  }catch(e){baglantiDurumu(false);console.error(e);}
 }
 function odalariGoster(odalar){
   const liste=el("odaListesi");
@@ -876,41 +888,29 @@ function odalariGoster(odalar){
   odalar.forEach(o=>{
     const div=document.createElement("div");div.className="oda-item";
     const et=[];
-    if(o.kategori){
-      const katIkon={sohbet:"💬",tartisma:"🔥",fikir:"💡",etkilesim:"⚡"};
-      et.push(`<span class="kat-etiket">${katIkon[o.kategori]||""} ${o.kategori}</span>`);
-    }
-    const kilitEtiket = o.password
-      ? `<span class="etiket" style="color:#f87171;border-color:#3a1010;background:#1a0505">🔒 Şifreli</span>`
-      : `<span class="etiket" style="color:#34d399;border-color:#0f2e1c;background:#0a1a12">🔓 Açık</span>`;
-    if(o.max_users)et.push(`👥 ${o.max_users}`);
-    if(o.duyuru_modu)et.push("📢");
-    const konuHtml = (o.konu && o.konu.trim())
-      ? `<div style="font-size:11px;color:#6d4aa0;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%">📝 ${safe(o.konu)}</div>`
-      : "";
-    div.innerHTML=`<div style="flex:1;min-width:0;overflow:hidden">`
-      +`<div class="oda-adi">${safe(o.name)}</div>`
-      +konuHtml
-      +`<div class="oda-etiketler">${kilitEtiket}${et.join("")}</div>`
-      +`</div>`
-      +`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2a1e42" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-left:6px"><polyline points="9 18 15 12 9 6"/></svg>`;
+    if(o.kategori){const k={sohbet:"💬",tartisma:"🔥",fikir:"💡",etkilesim:"⚡"};et.push(`<span class="kat-etiket">${k[o.kategori]||""} ${o.kategori}</span>`);}
+    const kE=o.password?`<span class="etiket" style="color:#f87171;border-color:#3a1010;background:#1a0505">🔒 Şifreli</span>`:`<span class="etiket" style="color:#34d399;border-color:#0f2e1c;background:#0a1a12">🔓 Açık</span>`;
+    if(o.maxUsers)et.push(`👥 ${o.maxUsers}`);
+    if(o.duyuruModu)et.push("📢");
+    const kH=(o.konu&&o.konu.trim())?`<div style="font-size:11px;color:#6d4aa0;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📝 ${safe(o.konu)}</div>`:"";
+    div.innerHTML=`<div style="flex:1;min-width:0;overflow:hidden"><div class="oda-adi">${safe(o.name)}</div>${kH}<div class="oda-etiketler">${kE}${et.join("")}</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2a1e42" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-left:6px"><polyline points="9 18 15 12 9 6"/></svg>`;
     div.onclick=()=>odayaTikla(o);liste.appendChild(div);
   });
 }
 function odalariFiltrele(){
   const q=el("odaAra").value.toLowerCase();
-  odalariGoster(tumOdalar.filter(o=>o.name.toLowerCase().includes(q)));
+  odalariGoster(tumOdalar.filter(o=>o.name.toLowerCase().includes(q)&&(!aktifKategori||o.kategori===aktifKategori)));
 }
+function katFiltrele(btn,kat){aktifKategori=kat;document.querySelectorAll(".kat-btn").forEach(b=>b.classList.remove("secili"));btn.classList.add("secili");odalariFiltrele();}
 
-// GİRİŞ
 function odayaTikla(oda){
   aktifOda=oda;
   if(oda.password){
     el("sifreBaslik").textContent=oda.name;el("sifreGir").value="";el("sifreIsim").value="";
     hataGizle("sifreErr");gizle("anaSayfa");goster("sifreSayfasi");
-  }else{
-    el("isimBaslik").textContent=oda.name;el("isimGir").value="";
-    hataGizle("isimErr");gizle("anaSayfa");goster("isimSayfasi");
+  } else {
+    if(aktifHesap){aktifIsim=aktifHesap.username+"#"+Math.floor(100+Math.random()*900);gizle("anaSayfa");sohbeteGir();}
+    else{el("isimBaslik").textContent=oda.name;el("isimGir").value="";hataGizle("isimErr");gizle("anaSayfa");goster("isimSayfasi");}
   }
 }
 async function sifreDogrula(){
@@ -918,339 +918,290 @@ async function sifreDogrula(){
   if(!i){hata("sifreErr","Takma isim gir!");return;}
   if(s!==aktifOda.password){hata("sifreErr","Şifre yanlış!");return;}
   const lh=await limitKontrol();if(lh){hata("sifreErr",lh);return;}
-  aktifIsim=i;sohbeteGir();
+  aktifIsim=i+"#"+Math.floor(100+Math.random()*900);gizle("sifreSayfasi");await sohbeteGir();
 }
 async function isimleGir(){
   const i=el("isimGir").value.trim();
   if(!i){hata("isimErr","Takma isim gir!");return;}
   const lh=await limitKontrol();if(lh){hata("isimErr",lh);return;}
-  aktifIsim=i;sohbeteGir();
+  aktifIsim=i+"#"+Math.floor(100+Math.random()*900);gizle("isimSayfasi");await sohbeteGir();
 }
 async function limitKontrol(){
-  if(!aktifOda.max_users)return null;
-  const sinir=new Date(Date.now()-30000).toISOString();
-  const{data}=await sb.from("presence").select("id").eq("room_id",aktifOda.id).gte("last_seen",sinir);
-  const s=(data||[]).length;
-  return s>=aktifOda.max_users?`Oda dolu! (${s}/${aktifOda.max_users})`:null;
+  if(!aktifOda.maxUsers)return null;
+  const sinir=new Date(Date.now()-35000);
+  const snap=await db.collection("rooms").doc(aktifOda.id).collection("presence").where("lastSeen",">=",sinir).get();
+  if(snap.size>=aktifOda.maxUsers)return `Oda dolu! (${snap.size}/${aktifOda.maxUsers})`;
+  return null;
 }
 
 async function sohbeteGir(){
   el("altNav").style.display="none";
-  yoneticiMi=false;sonMesajId=null;gorulenPollId=null;
-  const tag = Math.floor(100 + Math.random()*900);
-  aktifIsim = aktifIsim + "#" + tag;
-  gizle("sifreSayfasi");gizle("isimSayfasi");
+  yoneticiMi=false;gorulenPollId=null;
   chatGoster();
   el("chatBaslik").textContent=aktifOda.name;
   el("chatIsimGoster").textContent=aktifIsim;
   el("mesajlar").innerHTML="";
-  gorulenPollId=null;
-  // Önce cache'den yükle (hızlı görünsün)
-  try{
-    const cache = localStorage.getItem("msgs_"+aktifOda.id);
-    if(cache){
-      const cached = JSON.parse(cache);
-      cached.forEach(m=>{
-        const benimMi=m.name===aktifIsim;
-        const dataIdx=cached.findIndex(x=>x.id===m.id);
-        const onceki=dataIdx>0?cached[dataIdx-1]:null;
-        const grupBaslangic=!onceki||onceki.name!==m.name;
-        let grup;
-        if(grupBaslangic){
-          grup=document.createElement("div");
-          grup.className="msg-grup "+(benimMi?"benim":"diger");
-          const isimDiv=document.createElement("div");
-          isimDiv.className="msg-grup-isim";
-          isimDiv.textContent=m.name;
-          grup.appendChild(isimDiv);
-          el("mesajlar").appendChild(grup);
-        }else{
-          const gruplar=el("mesajlar").querySelectorAll(".msg-grup");
-          grup=gruplar[gruplar.length-1];
-        }
-        const div=document.createElement("div");
-        div.className="msg "+(benimMi?"benim":"diger");
-        div.dataset.id=m.id;div.dataset.isim=m.name;div.dataset.mesaj=m.message;
-        const saat=new Date(m.created_at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
-        const alintiBlok=m.reply_to?`<div class="alinti-blok">↩ ${safe(m.reply_to)}</div>`:"";
-        div.innerHTML=`${alintiBlok}<div class="msg-icerik">${safe(m.message)}</div><div class="msg-alt"><span class="msg-saat">${saat}</span><span class="alinti-btn" onclick="alintiYap(this)">↩</span><span class="ilet-btn" onclick="iletAc(this)">↗</span></div>`;
-        grup.appendChild(div);
-      });
-      el("mesajlar").scrollTop=el("mesajlar").scrollHeight;
-    }
-  }catch(e){}
   gizle("yoneticiPanel");
   el("yGiris").style.display="block";el("yOnaylandi").style.display="none";
   el("yKey").value="";hataGizle("yErr");
   alintiTemizle();bildirimDurumYukle();duyuruGuncelle();konuGoster();talepBtnGuncelle();
   el("durumDot").className="durum-dot";
   await presenceGir();
-  // Oda sahibiyse otomatik admin yap
-  if(aktifHesap && aktifOda.user_id === aktifHesap.id){
-    if(!aktifIsim) aktifIsim = aktifHesap.username;
-    yoneticiMi=true;
-    el("yoneticiPanel").style.display="none";
-    el("yGiris").style.display="none";
-    el("yOnaylandi").style.display="block";
-    duyuruGuncelle(); talepBtnGuncelle();
+  if(aktifHesap&&aktifOda.ownerId===aktifHesap.id){
+    yoneticiMi=true;el("yGiris").style.display="none";el("yOnaylandi").style.display="block";
+    duyuruGuncelle();talepBtnGuncelle();
   }
-  await mesajlariYukle();
-  await onlineGuncelle();
-  // Realtime: yeni mesaj gelince anında güncelle
-  if(realtimeChannel){ sb.removeChannel(realtimeChannel); }
-  realtimeChannel = sb.channel("messages:"+aktifOda.id)
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},
-      (payload)=>{ 
-        if(payload.new.room === aktifOda.id) mesajEkle(payload.new);
-      }
-    ).subscribe();
-  // Polling sadece online/kick/durum için (daha seyrek)
-  timer=setInterval(async()=>{
-    try{
-      await mesajlariYukle();
-      await onlineGuncelle();await odaDurumGuncelle();await kickKontrolEt();
-      baglantiDurumu(true);
-    }catch(e){ baglantiDurumu(false); }
-  },3000);
+  if(mesajUnsubscribe)mesajUnsubscribe();
+  mesajUnsubscribe=db.collection("rooms").doc(aktifOda.id).collection("messages")
+    .orderBy("createdAt","asc").limitToLast(100)
+    .onSnapshot(snap=>{
+      snap.docChanges().forEach(ch=>{
+        if(ch.type==="added"){
+          const m={id:ch.doc.id,...ch.doc.data(),created_at:ch.doc.data().createdAt?.toDate?.()?.toISOString()||new Date().toISOString()};
+          mesajEkle(m);
+        }
+      });
+      el("durumDot").className="durum-dot ok";
+    },()=>baglantiDurumu(false));
+  if(timer)clearInterval(timer);
+  timer=setInterval(async()=>{try{await onlineGuncelle();await kickKontrolEt();baglantiDurumu(true);}catch(e){baglantiDurumu(false);}},4000);
+  if(presTimer)clearInterval(presTimer);
   presTimer=setInterval(presenceYenile,10000);
-  // el("mesajIn").focus(); // klavye açılmasın
 }
 
-// PRESENCE
 async function presenceGir(){
-  if(presenceId){await sb.from("presence").delete().eq("id",presenceId);presenceId=null;}
-  const{data}=await sb.from("presence").insert([{room_id:aktifOda.id,name:aktifIsim}]).select().single();
-  if(data)presenceId=data.id;
+  if(presenceRef)await presenceRef.delete().catch(()=>{});
+  presenceRef=db.collection("rooms").doc(aktifOda.id).collection("presence").doc();
+  await presenceRef.set({name:aktifIsim,lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
 }
-async function presenceYenile(){
-  if(!presenceId)return;
-  await sb.from("presence").update({last_seen:new Date().toISOString()}).eq("id",presenceId);
-}
-async function presenceCik(){
-  if(presenceId){await sb.from("presence").delete().eq("id",presenceId);presenceId=null;}
-}
+async function presenceYenile(){if(!presenceRef)return;await presenceRef.update({lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});}
+async function presenceCik(){if(presenceRef){await presenceRef.delete().catch(()=>{});presenceRef=null;}}
 async function onlineGuncelle(){
-  const sinir=new Date(Date.now()-30000).toISOString();
-  const{data}=await sb.from("presence").select("name").eq("room_id",aktifOda.id).gte("last_seen",sinir);
-  onlineKisiler=(data||[]).map(p=>p.name);
-  const max=aktifOda.max_users?`/${aktifOda.max_users}`:"";
+  const sinir=new Date(Date.now()-35000);
+  const snap=await db.collection("rooms").doc(aktifOda.id).collection("presence").where("lastSeen",">=",sinir).get();
+  onlineKisiler=snap.docs.map(d=>d.data().name);
+  const max=aktifOda.maxUsers?`/${aktifOda.maxUsers}`:"";
   el("onlineSayi").textContent=onlineKisiler.length+max;
 }
 
-// TEK MESAJ EKLE (Realtime için)
 function mesajEkle(m){
-  const box = el("mesajlar");
-  if(!box) return;
-  if(box.querySelector(`.msg[data-id="${m.id}"]`)) return;
-  if(m.name === "📢 Duyuru"){ duyuruBannerGoster(m.message); return; } // zaten var
-  const benimMi = m.name===aktifIsim;
-  const scrollBottom = box.scrollHeight-box.scrollTop-box.clientHeight<80;
-  const gruplar = box.querySelectorAll(".msg-grup");
-  const sonGrup = gruplar[gruplar.length-1];
-  const oncekiIsim = sonGrup ? sonGrup.querySelector(".msg-grup-isim")?.textContent : null;
+  const box=el("mesajlar");if(!box)return;
+  if(box.querySelector(`.msg[data-id="${m.id}"]`))return;
+  if(m.name==="📢 Duyuru"){duyuruBannerGoster(m.message);return;}
+  const benimMi=m.name===aktifIsim;
+  const scrollBottom=box.scrollHeight-box.scrollTop-box.clientHeight<100;
+  const gruplar=box.querySelectorAll(".msg-grup");
+  const sonGrup=gruplar[gruplar.length-1];
+  const oncekiIsim=sonGrup?sonGrup.querySelector(".msg-grup-isim")?.textContent:null;
   let grup;
-  if(!sonGrup || oncekiIsim !== m.name){
-    grup = document.createElement("div");
-    grup.className = "msg-grup yeni "+(benimMi?"benim":"diger");
-    const isimDiv = document.createElement("div");
-    isimDiv.className = "msg-grup-isim";
-    isimDiv.textContent = m.name;
-    grup.appendChild(isimDiv);
-    box.appendChild(grup);
-  } else {
-    grup = sonGrup;
-  }
-  const div = document.createElement("div");
-  div.className = "msg yeni "+(benimMi?"benim":"diger");
-  div.dataset.id = m.id; div.dataset.isim = m.name; div.dataset.mesaj = m.message;
-  const saat = new Date(m.created_at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
-  const alintiBlok = m.reply_to?`<div class="alinti-blok">↩ ${safe(m.reply_to)}</div>`:"";
+  if(!sonGrup||oncekiIsim!==m.name){
+    grup=document.createElement("div");grup.className="msg-grup yeni "+(benimMi?"benim":"diger");
+    const isimDiv=document.createElement("div");isimDiv.className="msg-grup-isim";isimDiv.textContent=m.name;
+    grup.appendChild(isimDiv);box.appendChild(grup);
+  } else grup=sonGrup;
+  const div=document.createElement("div");
+  div.className="msg yeni "+(benimMi?"benim":"diger");
+  div.dataset.id=m.id;div.dataset.isim=m.name;div.dataset.mesaj=m.message;
+  const saat=new Date(m.created_at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+  const alintiBlok=m.replyTo?`<div class="alinti-blok">↩ ${safe(m.replyTo)}</div>`:"";
   div.innerHTML=`${alintiBlok}<div class="msg-icerik">${safe(m.message)}</div><div class="msg-alt"><span class="msg-saat">${saat}</span><span class="alinti-btn" onclick="alintiYap(this)">↩</span><span class="ilet-btn" onclick="iletAc(this)">↗</span></div>`;
   let tapTimer=null;
-  div.addEventListener("click",()=>{
-    if(tapTimer){clearTimeout(tapTimer);tapTimer=null;alintiYapDiv(div);}
-    else{tapTimer=setTimeout(()=>{tapTimer=null;},300);}
-  });
+  div.addEventListener("click",()=>{if(tapTimer){clearTimeout(tapTimer);tapTimer=null;alintiYapDiv(div);}else tapTimer=setTimeout(()=>{tapTimer=null;},300);});
   grup.appendChild(div);
-  if(scrollBottom) box.scrollTop = box.scrollHeight;
-  if(m.name!==aktifIsim) bildirimGonder(m.name,m.message);
-  sonMesajId = m.id;
-  // cache güncelle
-  try{
-    const cache = JSON.parse(localStorage.getItem("msgs_"+aktifOda.id)||"[]");
-    cache.push(m);
-    localStorage.setItem("msgs_"+aktifOda.id, JSON.stringify(cache.slice(-200)));
-  }catch(e){}
-}
-
-// MESAJLAR
-async function mesajlariYukle(){
-  const{data,error}=await sb.from("messages").select("*").eq("room",aktifOda.id).order("created_at",{ascending:true});
-  if(error){el("durumDot").style.background="#f87171";return;}
-  const box=el("mesajlar");
-  const mevcutlar=new Set(Array.from(box.querySelectorAll(".msg")).map(e=>e.dataset.id));
-  const yeni=(data||[]).filter(m=>!mevcutlar.has(String(m.id)));
-  // localStorage'a kaydet
-  if(data&&data.length>0){
-    try{ localStorage.setItem("msgs_"+aktifOda.id, JSON.stringify(data.slice(-200))); }catch(e){}
-  }
-  if(yeni.length===0){el("durumDot").className="durum-dot ok";return;}
-  const scrollBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
-  yeni.forEach(m=>{
-    const benimMi=m.name===aktifIsim;
-    const dataIdx=(data||[]).findIndex(x=>x.id===m.id);
-    const onceki=dataIdx>0?data[dataIdx-1]:null;
-    const grupBaslangic=!onceki||onceki.name!==m.name;
-    let grup;
-    if(grupBaslangic){
-      grup=document.createElement("div");
-      grup.className="msg-grup "+(benimMi?"benim":"diger");
-      const isimDiv=document.createElement("div");
-      isimDiv.className="msg-grup-isim";
-      isimDiv.textContent=m.name;
-      grup.appendChild(isimDiv);
-      box.appendChild(grup);
-    }else{
-      const gruplar=box.querySelectorAll(".msg-grup");
-      grup=gruplar[gruplar.length-1];
-    }
-    const div=document.createElement("div");
-    div.className="msg "+(benimMi?"benim":"diger");
-    div.dataset.id=m.id;div.dataset.isim=m.name;div.dataset.mesaj=m.message;
-    const saat=new Date(m.created_at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
-    const alintiBlok=m.reply_to?`<div class="alinti-blok">↩ ${safe(m.reply_to)}</div>`:"";
-    div.innerHTML=`${alintiBlok}<div class="msg-icerik">${safe(m.message)}</div><div class="msg-alt"><span class="msg-saat">${saat}</span><span class="alinti-btn" onclick="alintiYap(this)">↩</span><span class="ilet-btn" onclick="iletAc(this)">↗</span></div>`;
-    let tapTimer=null;
-    div.addEventListener("click",()=>{
-      if(tapTimer){clearTimeout(tapTimer);tapTimer=null;alintiYapDiv(div);}
-      else{tapTimer=setTimeout(()=>{tapTimer=null;},300);}
-    });
-    grup.appendChild(div);
-    if(sonMesajId!==null&&m.name!==aktifIsim)bildirimGonder(m.name,m.message);
-  });
   if(scrollBottom)box.scrollTop=box.scrollHeight;
-  if(data&&data.length>0)sonMesajId=data[data.length-1].id;
-  else if(sonMesajId===null)sonMesajId="bos";
-  await pollYukle();
-  taleplerGoster(data);
-  el("durumDot").className="durum-dot ok";
+  if(m.name!==aktifIsim)bildirimGonder(m.name,m.message);
 }
 
-// İLETME
-let iletMsg=null;
-function iletAc(el_){
-  const m=el_.classList.contains("msg")?el_:el_.closest(".msg");
-  if(!m)return;
-  iletMsg={isim:m.dataset.isim,metin:m.dataset.mesaj};
-  el("iletMesajOnizleme").textContent=iletMsg.isim+": "+iletMsg.metin;
-  el("iletPopup").style.display="block";
-}
-function iletKapat(){iletMsg=null;el("iletPopup").style.display="none";}
-function iletMesajiGonder(){
-  if(!iletMsg)return;
-  alintiMsg={isim:iletMsg.isim,metin:iletMsg.metin};
-  el("alintiMetin").textContent=alintiMsg.isim+": "+alintiMsg.metin;
-  el("alintiOnizleme").style.display="flex";
-  iletKapat();el("mesajIn").focus();
-}
-
-// ALINTI
-function alintiYapDiv(div){
-  const mesaj = div.dataset.mesaj;
-  const isim = div.dataset.isim;
-  if(!mesaj) return;
-  aktifAlinti = isim + ": " + mesaj;
-  el("alintiOnizleme").textContent = "↩ " + aktifAlinti;
-  el("alintiBar").style.display = "flex";
-  el("mesajInput").focus();
-  setTimeout(setirChatYukseklik, 100);
-}
-
-function alintiYap(btn){
-  const m=btn.closest(".msg");
-  alintiMsg={isim:m.dataset.isim,metin:m.dataset.mesaj};
-  el("alintiMetin").textContent=alintiMsg.isim+": "+alintiMsg.metin;
-  el("alintiOnizleme").style.display="flex";
-  el("mesajIn").focus();
-}
-function alintiTemizle(){alintiMsg=null;gizle("alintiOnizleme");}
-
-// GÖNDER
 async function gonder(){
-  if(aktifOda.duyuru_modu&&!yoneticiMi)return;
+  if(aktifOda.duyuruModu&&!yoneticiMi)return;
   const text=el("mesajIn").value.trim();if(!text)return;
   hataGizle("chatErr");
   el("gonderBtn").disabled=true;el("mesajIn").value="";
-  const veri={room:aktifOda.id,name:aktifIsim,message:text};
-  if(alintiMsg)veri.reply_to=alintiMsg.isim+": "+alintiMsg.metin.substring(0,60);
+  const veri={name:aktifIsim,message:text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(alintiMsg)veri.replyTo=alintiMsg.isim+": "+alintiMsg.metin.substring(0,60);
   alintiTemizle();
-  const{data:yeniMesaj, error}=await sb.from("messages").insert([veri]).select().single();
+  try{await db.collection("rooms").doc(aktifOda.id).collection("messages").add(veri);}
+  catch(e){hata("chatErr","Gönderilemedi!");el("mesajIn").value=text;}
   el("gonderBtn").disabled=false;
-  if(error){el("mesajIn").value=text;hata("chatErr","Gönderilemedi!");}
-  else if(yeniMesaj){ mesajEkle(yeniMesaj); }
-  const ta = el("mesajIn"); ta.style.height="auto"; ta.focus();
+  const ta=el("mesajIn");ta.style.height="auto";ta.focus();
 }
 
-// TEXTAREA OTO BÜYÜME
-document.addEventListener("DOMContentLoaded", () => {
-  const ta = el("mesajIn");
-  if(!ta) return;
-  function autoResize(){
-    ta.style.height = "0px";
-    ta.style.height = Math.min(ta.scrollHeight + 2, 120) + "px";
-  }
-  ta.addEventListener("input", autoResize);
-  ta.addEventListener("keyup", autoResize);
-  ta.addEventListener("paste", ()=>setTimeout(autoResize,10));
-  ta.addEventListener("keydown", function(e){
-    if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); gonder(); setTimeout(autoResize, 10); }
-  });
+document.addEventListener("DOMContentLoaded",()=>{
+  const ta=el("mesajIn");if(!ta)return;
+  function autoResize(){ta.style.height="0px";ta.style.height=Math.min(ta.scrollHeight+2,120)+"px";}
+  ta.addEventListener("input",autoResize);
+  ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();gonder();setTimeout(autoResize,10);}});
 });
 
-// DUYURU
+let iletMsg=null;
+function iletAc(el_){const m=el_.classList.contains("msg")?el_:el_.closest(".msg");if(!m)return;iletMsg={isim:m.dataset.isim,metin:m.dataset.mesaj};el("iletMesajOnizleme").textContent=iletMsg.isim+": "+iletMsg.metin;el("iletPopup").style.display="block";}
+function iletKapat(){iletMsg=null;el("iletPopup").style.display="none";}
+function iletMesajiGonder(){if(!iletMsg)return;alintiMsg={isim:iletMsg.isim,metin:iletMsg.metin};el("alintiMetin").textContent=alintiMsg.isim+": "+alintiMsg.metin;el("alintiOnizleme").style.display="flex";iletKapat();el("mesajIn").focus();}
+function alintiYap(btn){const m=btn.closest(".msg");alintiMsg={isim:m.dataset.isim,metin:m.dataset.mesaj};el("alintiMetin").textContent=alintiMsg.isim+": "+alintiMsg.metin;el("alintiOnizleme").style.display="flex";el("mesajIn").focus();}
+function alintiYapDiv(div){alintiMsg={isim:div.dataset.isim,metin:div.dataset.mesaj};el("alintiMetin").textContent=alintiMsg.isim+": "+alintiMsg.metin;el("alintiOnizleme").style.display="flex";el("mesajIn").focus();setTimeout(setirChatYukseklik,100);}
+function alintiTemizle(){alintiMsg=null;gizle("alintiOnizleme");}
+
+function popupAc(){
+  el("popupListe").innerHTML=onlineKisiler.length===0?'<div style="color:#2a1e42;padding:8px 0;font-size:14px">Kimse yok</div>':onlineKisiler.map(n=>`<div class="popup-kisi"><span class="online-dot"></span>${safe(n)}${yoneticiMi&&n!==aktifIsim?`<button onclick="kickAc('${safe(n)}')" style="margin-left:auto;padding:3px 10px;border-radius:8px;border:none;background:#1a0505;color:#f87171;font-size:11px;cursor:pointer;font-family:inherit">At</button>`:''}</div>`).join("");
+  el("onlinePopup").style.display="flex";
+}
+function popupKapat(){gizle("onlinePopup");}
+el("onlinePopup").addEventListener("click",e=>{if(e.target===el("onlinePopup"))popupKapat();});
+
+function bildirimOdaKey(){return "bil_"+(aktifOda?aktifOda.id:"");}
+async function bildirimToggle(){
+  if(!("Notification"in window)){alert("Tarayıcın bildirimleri desteklemiyor.");return;}
+  if(bildirimAcik){bildirimAcik=false;localStorage.removeItem(bildirimOdaKey());}
+  else{const izin=await Notification.requestPermission();if(izin==="granted"){bildirimAcik=true;localStorage.setItem(bildirimOdaKey(),"1");}else{alert("Bildirim izni verilmedi.");return;}}
+  bildirimGuncelle();
+}
+function bildirimGuncelle(){if(bildirimAcik){el("bildirimBadge").classList.add("aktif");el("bildirimYazi").textContent="Açık";}else{el("bildirimBadge").classList.remove("aktif");el("bildirimYazi").textContent="Bildirim";}}
+function bildirimDurumYukle(){bildirimAcik=localStorage.getItem(bildirimOdaKey())==="1"&&Notification.permission==="granted";bildirimGuncelle();}
+function bildirimGonder(isim,mesaj){if(!bildirimAcik||document.visibilityState==="visible")return;new Notification("MukoCan Chat — #"+aktifOda.name,{body:isim+": "+mesaj,icon:"/favicon.ico"});}
+
 function duyuruGuncelle(){
-  const ac=aktifOda.duyuru_modu;
+  const ac=aktifOda.duyuruModu;
   el("duyuruBar").style.display=ac?"block":"none";
   if(ac&&!yoneticiMi){gizle("mesajKutu");goster("kilitliBilgi");}
   else{goster("mesajKutu");gizle("kilitliBilgi");}
   el("duyuruBtn").textContent=ac?"📢 Duyuru Modunu Kapat":"📢 Duyuru Modunu Aç";
 }
-async function odaDurumGuncelle(){
-  const{data}=await sb.from("rooms").select("duyuru_modu").eq("id",aktifOda.id).single();
-  if(data&&data.duyuru_modu!==aktifOda.duyuru_modu){aktifOda.duyuru_modu=data.duyuru_modu;duyuruGuncelle();}
-}
 async function duyuruToggle(){
-  const yeni=!aktifOda.duyuru_modu;
-  await sb.from("rooms").update({duyuru_modu:yeni}).eq("id",aktifOda.id);
-  aktifOda.duyuru_modu=yeni;duyuruGuncelle();
+  const yeni=!aktifOda.duyuruModu;
+  await db.collection("rooms").doc(aktifOda.id).update({duyuruModu:yeni});
+  aktifOda.duyuruModu=yeni;duyuruGuncelle();
+}
+let duyuruBannerTimer=null;
+function duyuruBannerGoster(metin){
+  const b=el("duyuruBanner");b.textContent="📢 "+metin;b.style.display="block";
+  if(duyuruBannerTimer)clearTimeout(duyuruBannerTimer);
+  duyuruBannerTimer=setTimeout(()=>{b.style.display="none";},6000);
+}
+function duyuruBannerKapat(){el("duyuruBanner").style.display="none";}
+async function herkeseDuyuru(){
+  const sonKey="duyuru_"+aktifOda.id;
+  const son=localStorage.getItem(sonKey);
+  if(son&&Date.now()-parseInt(son)<600000){alert("Duyuru için "+Math.ceil((600000-(Date.now()-parseInt(son)))/60000)+" dakika daha bekle!");return;}
+  const mesaj=prompt("Duyurunuzu yazın:");
+  if(!mesaj||!mesaj.trim())return;
+  await db.collection("rooms").doc(aktifOda.id).collection("messages").add({name:"📢 Duyuru",message:aktifIsim+": "+mesaj.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  localStorage.setItem(sonKey,Date.now().toString());duyuruBannerGoster(aktifIsim+": "+mesaj.trim());
 }
 
-// YÖNETİCİ
-function panelKapat(){ el("yoneticiPanel").style.display="none"; }
-function panelDisiKapat(e){ if(e.target===el("yoneticiPanel")) panelKapat(); }
-function panelToggle(){
-  const p=el("yoneticiPanel");
-  p.style.display=p.style.display==="block"?"none":"block";
+function talepBtnGuncelle(){const btn=el("talepBtn");if(!btn)return;btn.style.display=yoneticiMi?"none":"inline-flex";}
+async function talepGonder(){
+  const msg=prompt("Admin'e ne talep etmek istiyorsun?");
+  if(!msg||!msg.trim())return;
+  await db.collection("rooms").doc(aktifOda.id).collection("messages").add({name:"📋 Talep",message:aktifIsim+": "+msg.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  alert("Talebiniz gönderildi!");
 }
+
+function panelKapat(){el("yoneticiPanel").style.display="none";}
+function panelDisiKapat(e){if(e.target===el("yoneticiPanel"))panelKapat();}
+function panelToggle(){const p=el("yoneticiPanel");p.style.display=p.style.display==="flex"?"none":"flex";}
 async function yoneticiDogrula(){
   const key=el("yKey").value.trim();if(!key)return;
-  const{data}=await sb.from("rooms").select("owner_key").eq("id",aktifOda.id).single();
-  if(data&&data.owner_key===key){
-    yoneticiMi=true;
-    el("yGiris").style.display="none";el("yOnaylandi").style.display="block";duyuruGuncelle();talepBtnGuncelle();
-  }else hata("yErr","Yanlış anahtar!");
+  const d=await db.collection("rooms").doc(aktifOda.id).get();
+  if(d.exists&&d.data().ownerKey===key){yoneticiMi=true;el("yGiris").style.display="none";el("yOnaylandi").style.display="block";duyuruGuncelle();talepBtnGuncelle();}
+  else hata("yErr","Yanlış anahtar!");
 }
 async function odaSil(){
   if(!confirm("Odayı silmek istediğine emin misin?"))return;
-  await sb.from("presence").delete().eq("room_id",aktifOda.id);
-  await sb.from("messages").delete().eq("room",aktifOda.id);
-  await sb.from("rooms").delete().eq("id",aktifOda.id);
-  cik();
+  const msgs=await db.collection("rooms").doc(aktifOda.id).collection("messages").get();
+  const batch=db.batch();msgs.docs.forEach(d=>batch.delete(d.ref));await batch.commit();
+  await db.collection("rooms").doc(aktifOda.id).delete();cik();
 }
 
-// YENİ ODA
-function yeniOdaGoster(){goster("yeniOdaForm");el("yeniAd").focus();}
+async function konuGuncelle(){
+  const k=el("konuInput").value.trim().substring(0,30);
+  await db.collection("rooms").doc(aktifOda.id).update({konu:k||null});
+  aktifOda.konu=k||null;konuGoster();alert(k?"Konu güncellendi! ✅":"Konu kaldırıldı!");
+}
+function konuGoster(){
+  if(aktifOda.konu){el("konuBar").style.display="block";el("konuMetin").textContent=aktifOda.konu;}
+  else el("konuBar").style.display="none";
+  if(el("konuInput"))el("konuInput").value=aktifOda.konu||"";
+}
+async function sifreDegistir(){
+  const s=el("yeniSifreInput").value.trim();
+  await db.collection("rooms").doc(aktifOda.id).update({password:s||null});
+  aktifOda.password=s||null;el("yeniSifreInput").value="";alert(s?"Şifre güncellendi!":"Şifre kaldırıldı!");
+}
+
+let kickHedef=null;
+function kickAc(isim){kickHedef=isim;el("kickIsimGoster").textContent=isim+" adlı kişiyi atmak istediğine emin misin?";el("kickPopup").style.display="flex";popupKapat();}
+function kickKapat(){kickHedef=null;el("kickPopup").style.display="none";}
+async function kickUygula(){
+  if(!kickHedef)return;
+  await db.collection("rooms").doc(aktifOda.id).update({kickedNames:firebase.firestore.FieldValue.arrayUnion(kickHedef)});
+  kickKapat();
+}
+async function kickKontrolEt(){
+  if(!aktifIsim||!aktifOda)return;
+  const d=await db.collection("rooms").doc(aktifOda.id).get();
+  if(d.exists&&(d.data().kickedNames||[]).includes(aktifIsim)){alert("Odadan atıldınız!");cik();}
+}
+
+function pollSecenekEkle(){
+  const div=document.createElement("div");div.className="poll-secenek-input";
+  const n=document.querySelectorAll(".poll-sec-input").length+1;
+  div.innerHTML=`<input type="text" placeholder="Seçenek ${n}" style="font-size:12px" class="poll-sec-input"/>`;
+  el("pollSecenekler").appendChild(div);
+}
+async function pollBaslat(){
+  const soru=el("pollSoru").value.trim();
+  const secs=Array.from(document.querySelectorAll(".poll-sec-input")).map(i=>i.value.trim()).filter(Boolean);
+  if(!soru||secs.length<2){alert("Soru ve en az 2 seçenek gir!");return;}
+  await db.collection("rooms").doc(aktifOda.id).collection("polls").add({soru,secenekler:secs,oylar:{},bitti:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  el("pollSoru").value="";document.querySelectorAll(".poll-sec-input").forEach(i=>i.value="");
+  el("pollForm").style.display="none";gorulenPollId=null;await pollYukle();
+}
+async function oyVer(pollId,secenekIdx){
+  const d=await db.collection("rooms").doc(aktifOda.id).collection("polls").doc(pollId).get();
+  if(!d.exists||d.data().bitti){alert("Bu oylama sona erdi!");return;}
+  const oylar=d.data().oylar||{};
+  if(oylar[aktifIsim]!==undefined){alert("Zaten oy kullandınız!");return;}
+  oylar[aktifIsim]=secenekIdx;
+  await db.collection("rooms").doc(aktifOda.id).collection("polls").doc(pollId).update({oylar});
+  await pollYukle();
+}
+async function pollYukle(){
+  const snap=await db.collection("rooms").doc(aktifOda.id).collection("polls").where("bitti","==",false).orderBy("createdAt","desc").limit(1).get();
+  if(snap.empty){const e=document.getElementById("aktif-poll");if(e)e.remove();gorulenPollId=null;return;}
+  const d=snap.docs[0];const p={id:d.id,...d.data()};
+  if(gorulenPollId!==p.id){
+    const e=document.getElementById("aktif-poll");if(e)e.remove();gorulenPollId=p.id;
+    const wrap=document.createElement("div");wrap.id="aktif-poll";wrap.className="msg-grup diger";
+    const iDiv=document.createElement("div");iDiv.className="msg-grup-isim";iDiv.textContent="🗳️ Oylama";wrap.appendChild(iDiv);
+    const div=document.createElement("div");div.className="poll-msg";div.id="poll-icerik";wrap.appendChild(div);
+    el("mesajlar").insertBefore(wrap,el("mesajlar").firstChild);
+  }
+  pollRender(p);
+}
+function pollRender(p){
+  const div=document.getElementById("poll-icerik");if(!div)return;
+  const oylar=p.oylar||{},top=Object.keys(oylar).length,bOy=oylar[aktifIsim];
+  const secs=Array.isArray(p.secenekler)?p.secenekler:JSON.parse(p.secenekler);
+  let html=`<div class="poll-soru">${safe(p.soru)}</div>`;
+  secs.forEach((s,idx)=>{
+    const say=Object.values(oylar).filter(o=>o===idx).length;
+    const yuz=top>0?Math.round(say/top*100):0;
+    const sec=bOy===idx,ov=bOy!==undefined;
+    html+=`<div class="poll-secenek" style="margin-bottom:8px"><div class="poll-bar-wrap"><div class="poll-bar" style="width:${ov?yuz:0}%"></div><span class="poll-bar-label">${safe(s)}</span>${ov?`<span class="poll-bar-yuzde">${yuz}%${sec?" ✓":""}</span>`:""}</div>${!ov?`<button class="poll-oy-btn" onclick="oyVer('${p.id}',${idx})">Oy Ver</button>`:""}</div>`;
+  });
+  html+=`<div class="poll-toplam">${top} kişi oy kullandı</div>`;
+  if(yoneticiMi)html+=`<button onclick="pollBitir('${p.id}')" style="margin-top:8px;width:100%;padding:7px;border-radius:10px;border:1.5px solid #3a1010;background:#1a0505;color:#f87171;font-size:12px;cursor:pointer;font-family:inherit">⏹ Oylamayı Bitir</button>`;
+  div.innerHTML=html;
+}
+async function pollBitir(id){
+  if(!confirm("Oylamayı bitirmek istediğine emin misin?"))return;
+  await db.collection("rooms").doc(aktifOda.id).collection("polls").doc(id).update({bitti:true});
+  const w=document.getElementById("aktif-poll");if(w)w.remove();gorulenPollId=null;
+}
+
+function yeniOdaKontrol(){if(!aktifHesap){alert("Oda oluşturmak için giriş yapman gerekiyor! 👤");authAc();return;}goster("yeniOdaForm");el("yeniAd").focus();}
 function yeniOdaGizle(){gizle("yeniOdaForm");}
+function katSec(btn,kat){document.querySelectorAll(".kat-btn").forEach(b=>b.classList.remove("secili"));btn.classList.add("secili");el("seciliKategori").value=kat;}
 async function odaOlustur(){
   const ad=el("yeniAd").value.trim(),sifre=el("yeniSifre").value.trim();
   const yKey=el("yeniYKey").value.trim(),isim=el("yeniIsim").value.trim();
@@ -1258,37 +1209,177 @@ async function odaOlustur(){
   if(!ad||!isim){hata("yeniErr","Oda adı ve takma isim zorunlu!");return;}
   if(!yKey){hata("yeniErr","Yönetici anahtarı belirle!");return;}
   hataGizle("yeniErr");
-  // Max 3 oda kontrolü
   if(aktifHesap){
-    const{count}=await sb.from("rooms").select("id",{count:"exact",head:true}).eq("user_id",aktifHesap.id);
-    if(count>=3){hata("yeniErr","En fazla 3 oda açabilirsin! 🚫");return;}
+    const snap=await db.collection("rooms").where("ownerId","==",aktifHesap.id).get();
+    if(snap.size>=3){hata("yeniErr","En fazla 3 oda açabilirsin! 🚫");return;}
   }
   const konu=el("yeniKonu").value.trim().substring(0,30);
   const kategori=el("seciliKategori").value||null;
-  const{data,error}=await sb.from("rooms").insert([{name:ad,password:sifre||null,owner_key:yKey,max_users:maxU?parseInt(maxU):50,duyuru_modu:false,konu:konu||null,user_id:aktifHesap?aktifHesap.id:null,kategori}]).select().single();
-  if(error){hata("yeniErr","Hata: "+error.message);return;}
-  aktifOda=data;aktifIsim=isim;
-  yeniOdaGizle();gizle("anaSayfa");
-  await sohbeteGir();
-  yoneticiMi=true;el("yoneticiPanel").style.display="flex";
-  el("yGiris").style.display="none";el("yOnaylandi").style.display="block";duyuruGuncelle();
+  try{
+    const ref=await db.collection("rooms").add({name:ad,password:sifre||null,ownerKey:yKey,ownerId:aktifHesap?aktifHesap.id:null,maxUsers:maxU?parseInt(maxU):50,duyuruModu:false,konu:konu||null,kategori,kickedNames:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    aktifOda={id:ref.id,name:ad,password:sifre||null,ownerKey:yKey,ownerId:aktifHesap?.id||null,maxUsers:maxU?parseInt(maxU):50,duyuruModu:false,konu:konu||null,kategori,kickedNames:[]};
+    aktifIsim=isim+"#"+Math.floor(100+Math.random()*900);
+    yeniOdaGizle();gizle("anaSayfa");
+    await sohbeteGir();
+    yoneticiMi=true;el("yoneticiPanel").style.display="flex";
+    el("yGiris").style.display="none";el("yOnaylandi").style.display="block";duyuruGuncelle();
+  }catch(e){hata("yeniErr","Hata: "+e.message);}
 }
 
-// ÇIKIŞ
 async function cik(){
   el("altNav").style.display="flex";
-  clearInterval(timer);clearInterval(presTimer);timer=null;presTimer=null;
-  if(realtimeChannel){sb.removeChannel(realtimeChannel);realtimeChannel=null;}
+  if(timer){clearInterval(timer);timer=null;}
+  if(presTimer){clearInterval(presTimer);presTimer=null;}
+  if(mesajUnsubscribe){mesajUnsubscribe();mesajUnsubscribe=null;}
   await presenceCik();
   aktifOda=null;aktifIsim="";yoneticiMi=false;
-  el("mesajlar").innerHTML="";
-  gorulenPollId = null;
+  el("mesajlar").innerHTML="";gorulenPollId=null;
   el("chatSayfasi").style.display="none";
   gizle("onlinePopup");goster("anaSayfa");odalariYukle();
 }
 function anaSayfayaDon(){gizle("sifreSayfasi");gizle("isimSayfasi");goster("anaSayfa");}
 
-window.addEventListener("beforeunload",()=>{if(presenceId)sb.from("presence").delete().eq("id",presenceId);});
+let baglantiOk=true,baglantiGizleTimer=null;
+function baglantiDurumu(ok){
+  const bar=el("baglantiBar");
+  if(!ok&&baglantiOk){baglantiOk=false;bar.textContent="⚠️ Bağlantı kesildi...";bar.className="baglanti-bar";bar.style.display="block";}
+  else if(ok&&!baglantiOk){baglantiOk=true;bar.textContent="✅ Bağlantı yeniden kuruldu!";bar.className="baglanti-bar online";bar.style.display="block";if(baglantiGizleTimer)clearTimeout(baglantiGizleTimer);baglantiGizleTimer=setTimeout(()=>{bar.style.display="none";},3000);}
+}
+
+async function profilAc(){
+  if(!aktifHesap)return;
+  const ad=aktifHesap.username;
+  el("profilAvatar").textContent=ad[0].toUpperCase();
+  el("profilAdText").textContent=ad;
+  const tarih=new Date(aktifHesap.created_at).toLocaleDateString("tr-TR",{year:"numeric",month:"long",day:"numeric"});
+  el("profilTarih").textContent="Üyelik: "+tarih+(aktifHesap.email?" • "+aktifHesap.email:"");
+  const odaDiv=el("profilOdalar");
+  const snap=await db.collection("rooms").where("ownerId","==",aktifHesap.id).orderBy("createdAt","desc").get();
+  if(snap.empty){odaDiv.innerHTML='<div style="color:#2a1e42;font-size:13px">Henüz oda yok</div>';}
+  else{
+    odaDiv.innerHTML=snap.docs.map(d=>`<div class="profil-oda-item"><span>#${safe(d.data().name)}</span><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:#2a1e42">${d.data().createdAt?.toDate?.()?.toLocaleDateString("tr-TR")||""}</span><button class="profil-sil-btn" data-id="${d.id}" data-ad="${safe(d.data().name)}" style="background:#1a0505;border:1px solid #3a1010;color:#f87171;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit">Sil</button></div></div>`).join("");
+    odaDiv.querySelectorAll(".profil-sil-btn").forEach(btn=>{btn.addEventListener("click",()=>profilOdaSil(btn.dataset.id,btn.dataset.ad));});
+  }
+  el("profilOverlay").style.display="flex";
+}
+function profilKapat(){el("profilOverlay").style.display="none";}
+async function profilOdaSil(odaId,odaAd){
+  if(!confirm("#"+odaAd+" odasını silmek istiyor musun?"))return;
+  await db.collection("rooms").doc(odaId).delete();alert("Oda silindi! ✅");profilAc();
+}
+
+function navGit(sekme){
+  const dmSayfa=el("dmSayfasi"),anaSayfa=el("anaSayfa");
+  const navDm=el("navDm"),navOda=el("navOda");
+  if(sekme==="dm"){dmSayfa.style.display="";anaSayfa.style.display="none";navDm.classList.add("aktif");navOda.classList.remove("aktif");dmArkadasListeYukle();dmIstekKontrol();}
+  else{dmSayfa.style.display="none";anaSayfa.style.display="";navOda.classList.add("aktif");navDm.classList.remove("aktif");odalariYukle();}
+}
+
+function arkadasAc(){if(!aktifHesap){alert("Giriş yapman gerekiyor!");return;}el("arkadasOverlay").style.display="flex";el("arkadasAraInput").value="";el("arkadasAramaSonuc").innerHTML="";arkadasListeYukle();arkadasIstekYukle();}
+function arkadasKapat(){el("arkadasOverlay").style.display="none";}
+function arkadasTab(t){
+  if(t==="liste"){el("arkadasListeDiv").style.display="";el("arkadasIstekDiv").style.display="none";el("arkadasListeTab").classList.add("aktif");el("arkadasIstekTab").classList.remove("aktif");}
+  else{el("arkadasListeDiv").style.display="none";el("arkadasIstekDiv").style.display="";el("arkadasListeTab").classList.remove("aktif");el("arkadasIstekTab").classList.add("aktif");}
+}
+async function kullaniciAra(){
+  const q=el("arkadasAraInput").value.trim();if(!q)return;
+  const sonuc=el("arkadasAramaSonuc");sonuc.innerHTML='<div style="color:#3d2d5a;font-size:13px">Aranıyor...</div>';
+  const snap=await db.collection("users").where("username",">=",q).where("username","<=",q+"\uf8ff").limit(5).get();
+  const data=snap.docs.filter(d=>d.id!==aktifHesap.id);
+  if(!data.length){sonuc.innerHTML='<div style="color:#2a1e42;font-size:13px">Kullanıcı bulunamadı</div>';return;}
+  sonuc.innerHTML=data.map(d=>`<div class="arkadas-item"><div class="arkadas-avatar">${d.data().username[0].toUpperCase()}</div><div class="arkadas-ad">${safe(d.data().username)}</div><button class="arkadas-btn-mor" onclick="istekGonder('${d.id}','${safe(d.data().username)}',this)">+ İstek At</button></div>`).join("");
+}
+async function istekGonder(toId,toAd,btn){
+  btn.disabled=true;btn.textContent="Gönderildi";
+  try{await db.collection("friendRequests").add({fromId:aktifHesap.id,toId,fromName:aktifHesap.username,toName:toAd,status:"bekliyor",createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
+  catch(e){btn.disabled=false;btn.textContent="+ İstek At";alert("Hata!");}
+}
+async function arkadasListeYukle(){
+  const div=el("arkadasListeDiv");div.innerHTML='<div style="color:#3d2d5a;font-size:13px">Yükleniyor...</div>';
+  const s1=await db.collection("friendRequests").where("fromId","==",aktifHesap.id).where("status","==","kabul").get();
+  const s2=await db.collection("friendRequests").where("toId","==",aktifHesap.id).where("status","==","kabul").get();
+  const ark=[];
+  s1.docs.forEach(d=>ark.push({id:d.data().toId,username:d.data().toName}));
+  s2.docs.forEach(d=>ark.push({id:d.data().fromId,username:d.data().fromName}));
+  if(!ark.length){div.innerHTML='<div style="color:#2a1e42;font-size:13px;text-align:center;padding:20px">Henüz arkadaşın yok 😔</div>';return;}
+  div.innerHTML=ark.map(u=>`<div class="arkadas-item"><div class="arkadas-avatar">${(u.username||"?")[0].toUpperCase()}</div><div class="arkadas-ad">${safe(u.username||"?")}</div><button class="arkadas-btn-mor" onclick="dmAc('${u.id}','${safe(u.username)}')">💬 Mesaj</button></div>`).join("");
+}
+async function arkadasIstekYukle(){
+  const div=el("arkadasIstekDiv");
+  const snap=await db.collection("friendRequests").where("toId","==",aktifHesap.id).where("status","==","bekliyor").get();
+  const badge=el("istekBadge");
+  if(snap.empty){badge.style.display="none";div.innerHTML='<div style="color:#2a1e42;font-size:13px;text-align:center;padding:20px">Bekleyen istek yok</div>';return;}
+  badge.style.display="inline";badge.textContent=snap.size;
+  div.innerHTML=snap.docs.map(d=>`<div class="arkadas-item"><div class="arkadas-avatar">${(d.data().fromName||"?")[0].toUpperCase()}</div><div class="arkadas-ad">${safe(d.data().fromName||"?")}</div><button class="arkadas-btn-yesil" onclick="istekCevapla('${d.id}','kabul',this)">✓ Kabul</button><button class="arkadas-btn-kirmizi" onclick="istekCevapla('${d.id}','red',this)">✗ Reddet</button></div>`).join("");
+}
+async function istekCevapla(id,durum,btn){
+  btn.closest(".arkadas-item").style.opacity="0.5";
+  await db.collection("friendRequests").doc(id).update({status:durum});
+  arkadasListeYukle();arkadasIstekYukle();
+}
+async function dmIstekKontrol(){
+  if(!aktifHesap)return;
+  const snap=await db.collection("friendRequests").where("toId","==",aktifHesap.id).where("status","==","bekliyor").get();
+  const div=el("dmIstekBildirim");
+  if(snap.size>0){div.style.display="";div.textContent="🔔 "+snap.size+" bekleyen arkadaşlık isteği → görüntüle";}
+  else div.style.display="none";
+}
+async function dmArkadasListeYukle(){
+  if(!aktifHesap)return;
+  const div=el("dmArkadasListeSayfa");
+  const s1=await db.collection("friendRequests").where("fromId","==",aktifHesap.id).where("status","==","kabul").get();
+  const s2=await db.collection("friendRequests").where("toId","==",aktifHesap.id).where("status","==","kabul").get();
+  const ark=[];
+  s1.docs.forEach(d=>ark.push({id:d.data().toId,username:d.data().toName}));
+  s2.docs.forEach(d=>ark.push({id:d.data().fromId,username:d.data().fromName}));
+  if(!ark.length){div.innerHTML='<div style="color:#2a1e42;font-size:13px;text-align:center;padding:20px">Henüz arkadaşın yok 😔</div>';return;}
+  div.innerHTML=ark.map(u=>`<div class="arkadas-item" onclick="dmAc('${u.id}','${safe(u.username||"?")}')"><div class="arkadas-avatar">${(u.username||"?")[0].toUpperCase()}</div><div class="arkadas-ad">${safe(u.username||"?")}</div><span style="color:#3d2d5a;font-size:12px">💬</span></div>`).join("");
+}
+async function dmKullaniciAra(){
+  const q=el("dmAraInput").value.trim();if(!q)return;
+  if(!aktifHesap){alert("Giriş yapman gerekiyor!");return;}
+  const sonuc=el("dmAramaSonucSayfa");
+  const snap=await db.collection("users").where("username",">=",q).where("username","<=",q+"\uf8ff").limit(5).get();
+  const data=snap.docs.filter(d=>d.id!==aktifHesap.id);
+  if(!data.length){sonuc.innerHTML='<div style="color:#2a1e42;font-size:13px">Kullanıcı bulunamadı</div>';return;}
+  sonuc.innerHTML=data.map(d=>`<div class="arkadas-item"><div class="arkadas-avatar">${d.data().username[0].toUpperCase()}</div><div class="arkadas-ad">${safe(d.data().username)}</div><button class="arkadas-btn-mor" onclick="istekGonder('${d.id}','${safe(d.data().username)}',this)">+ İstek At</button></div>`).join("");
+}
+
+function dmChatId(a,b){return [a,b].sort().join("_");}
+function dmAc(toId,toAd){
+  aktifDmKisi={id:toId,username:toAd};
+  el("dmIsim").textContent=toAd;el("dmAvatar").textContent=toAd[0].toUpperCase();
+  el("dmMesajlar").innerHTML="";el("dmOverlay").style.display="flex";
+  arkadasKapat();
+  if(dmInterval){clearInterval(dmInterval);dmInterval=null;}
+  dmMesajlariYukle();dmInterval=setInterval(dmMesajlariYukle,4000);
+}
+function dmKapat(){el("dmOverlay").style.display="none";if(dmInterval){clearInterval(dmInterval);dmInterval=null;}aktifDmKisi=null;}
+async function dmMesajlariYukle(){
+  if(!aktifDmKisi||!aktifHesap)return;
+  const chatId=dmChatId(aktifHesap.id,aktifDmKisi.id);
+  const snap=await db.collection("dms").doc(chatId).collection("messages").orderBy("createdAt","asc").limitToLast(100).get();
+  if(snap.empty)return;
+  const box=el("dmMesajlar");
+  const mevcut=box.querySelectorAll(".dm-msg-wrap").length;
+  if(mevcut===snap.size)return;
+  const scrollBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+  box.innerHTML=snap.docs.map(d=>{
+    const m=d.data(),benim=m.fromId===aktifHesap.id;
+    const saat=m.createdAt?.toDate?.()?.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})||"";
+    return `<div class="dm-msg-wrap" style="display:flex;flex-direction:column;align-items:${benim?"flex-end":"flex-start"}"><div class="dm-msg ${benim?"benim":"diger"}">${safe(m.message)}</div><div class="dm-msg-saat">${saat}</div></div>`;
+  }).join("");
+  if(scrollBottom||mevcut===0)box.scrollTop=box.scrollHeight;
+}
+async function dmGonder(){
+  const msg=el("dmInput").value.trim();if(!msg||!aktifDmKisi||!aktifHesap)return;
+  el("dmInput").value="";el("dmInput").style.height="auto";
+  const chatId=dmChatId(aktifHesap.id,aktifDmKisi.id);
+  await db.collection("dms").doc(chatId).collection("messages").add({fromId:aktifHesap.id,toId:aktifDmKisi.id,message:msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  dmMesajlariYukle();
+}
+
+document.addEventListener('focusin',function(e){if(e.target&&e.target.id==='mesajIn'){setTimeout(setirChatYukseklik,150);setTimeout(setirChatYukseklik,400);}});
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape")popupKapat();
   if(e.key!=="Enter")return;
@@ -1297,670 +1388,12 @@ document.addEventListener("keydown",e=>{
   else if(el("isimSayfasi").style.display!=="none")isimleGir();
   else if(el("yeniOdaForm").style.display!=="none")odaOlustur();
 });
+window.addEventListener("beforeunload",()=>{if(presenceRef)presenceRef.delete().catch(()=>{});});
 
-// ===== TALEP SİSTEMİ =====
-let baglantiOk = true, baglantiGizleTimer = null;
-function baglantiDurumu(ok){
-  const bar = el("baglantiBar");
-  if(!ok && baglantiOk){
-    baglantiOk = false;
-    bar.textContent = "⚠️ Bağlantı kesildi, yeniden bağlanıyor...";
-    bar.className = "baglanti-bar";
-    bar.style.display = "block";
-    if(baglantiGizleTimer) clearTimeout(baglantiGizleTimer);
-  } else if(ok && !baglantiOk){
-    baglantiOk = true;
-    bar.textContent = "✅ Bağlantı yeniden kuruldu!";
-    bar.className = "baglanti-bar online";
-    bar.style.display = "block";
-    if(baglantiGizleTimer) clearTimeout(baglantiGizleTimer);
-    baglantiGizleTimer = setTimeout(()=>{ bar.style.display="none"; }, 3000);
-  }
-}
-
-let duyuruBannerTimer = null;
-function duyuruBannerGoster(metin){
-  const b = el("duyuruBanner");
-  b.textContent = "📢 " + metin;
-  b.style.display = "block";
-  if(duyuruBannerTimer) clearTimeout(duyuruBannerTimer);
-  duyuruBannerTimer = setTimeout(()=>{ b.style.display="none"; }, 6000);
-}
-function duyuruBannerKapat(){ el("duyuruBanner").style.display="none"; }
-
-async function herkeseDuyuru(){
-  const sonDuyuruKey = "duyuru_"+aktifOda.id;
-  const sonDuyuru = localStorage.getItem(sonDuyuruKey);
-  if(sonDuyuru && Date.now()-parseInt(sonDuyuru) < 600000){
-    const kalanSn = Math.ceil((600000-(Date.now()-parseInt(sonDuyuru)))/60000);
-    alert("Duyuru göndermek için "+kalanSn+" dakika daha beklemelisin!"); return;
-  }
-  const mesaj = prompt("Duyurunuzu yazın:");
-  if(!mesaj||!mesaj.trim()) return;
-  await sb.from("messages").insert([{room:aktifOda.id, name:"📢 Duyuru", message:aktifIsim+": "+mesaj.trim()}]);
-  localStorage.setItem(sonDuyuruKey, Date.now().toString());
-  duyuruBannerGoster(aktifIsim+": "+mesaj.trim());
-}
-
-async function talepGonder(){
-  const msg = prompt("Admin'e ne talep etmek istiyorsun?");
-  if(!msg||!msg.trim()) return;
-  await sb.from("messages").insert([{
-    room: aktifOda.id,
-    name: "📋 Talep",
-    message: aktifIsim + ": " + msg.trim()
-  }]);
-  alert("Talebiniz gönderildi!");
-}
-
-function talepBtnGuncelle(){
-  const btn = el("talepBtn");
-  if(!btn) return;
-  // Admin değilse talep butonu görünsün
-  if(!yoneticiMi) btn.style.display="inline-flex";
-  else btn.style.display="none";
-}
-
-// Admin panel - talep mesajlarını filtrele ve listele
-// Cevaplanan talepleri her seferinde hesapla
-const cevaplananTalepler = new Set();
-
-function taleplerGoster(mesajlar){
-  if(!yoneticiMi) return;
-  // Her seferinde sıfırdan hesapla
-  cevaplananTalepler.clear();
-  (mesajlar||[]).filter(m=>m.name==="🔔 Bildirim").forEach(m=>{
-    const match = m.message.match(/(?:onaylandı|reddedildi): (.+)$/);
-    if(match) cevaplananTalepler.add(match[1].trim());
-  });
-  // Sadece cevaplanmamış talepleri göster
-  const talepler = (mesajlar||[]).filter(m=>
-    m.name==="📋 Talep" && !cevaplananTalepler.has(m.message)
-  );
-  const liste = el("talepListe");
-  if(!liste) return;
-  if(!talepler.length){ liste.innerHTML='<div style="color:#2a1e42;font-size:12px">Henüz talep yok</div>'; return; }
-  liste.innerHTML = talepler.slice(-5).reverse().map(t=>`
-    <div class="talep-bildirim" id="talep-${t.id}">
-      <span style="flex:1">${safe(t.message)}</span>
-      <button class="talep-onay" onclick="talepCevapla('${t.id}','${safe(t.message)}','onay')">✓</button>
-      <button class="talep-red" onclick="talepCevapla('${t.id}','${safe(t.message)}','red')">✗</button>
-    </div>`).join("");
-}
-async function talepCevapla(talepId, talepMetin, tip){
-  // Listeden anında kaldır
-  const div = document.getElementById("talep-"+talepId);
-  if(div) div.remove();
-  cevaplananTalepler.add(talepMetin);
-  // Listede başka talep kaldı mı kontrol et
-  if(!el("talepListe").querySelector(".talep-bildirim")){
-    el("talepListe").innerHTML='<div style="color:#2a1e42;font-size:12px">Henüz talep yok</div>';
-  }
-  // Odaya bildirim gönder
-  const cevap = tip==="onay" 
-    ? "✅ Talebiniz onaylandı: " + talepMetin
-    : "❌ Talebiniz reddedildi: " + talepMetin;
-  await sb.from("messages").insert([{room:aktifOda.id, name:"🔔 Bildirim", message:cevap}]);
-}
-
-// ===== ODA KONUSU =====
-async function konuGuncelle(){
-  const k = el("konuInput").value.trim().substring(0,30);
-  const {error} = await sb.from("rooms").update({konu: k||null}).eq("id", aktifOda.id);
-  if(error){ alert("Hata: "+error.message); return; }
-  aktifOda.konu = k||null;
-  konuGoster();
-  alert(k ? "Konu güncellendi! ✅" : "Konu kaldırıldı!");
-}
-function konuGoster(){
-  if(aktifOda.konu){ el("konuBar").style.display="block"; el("konuMetin").textContent=aktifOda.konu; }
-  else { el("konuBar").style.display="none"; }
-  if(el("konuInput")) el("konuInput").value = aktifOda.konu||"";
-}
-
-// ===== ŞİFRE DEĞİŞTİR =====
-async function sifreDegistir(){
-  const s = el("yeniSifreInput").value.trim();
-  await sb.from("rooms").update({password: s||null}).eq("id", aktifOda.id);
-  aktifOda.password = s||null;
-  el("yeniSifreInput").value="";
-  alert(s ? "Şifre güncellendi!" : "Şifre kaldırıldı!");
-}
-
-// ===== KULLANICI ATMA =====
-let kickHedef = null;
-function kickAc(isim){ kickHedef=isim; el("kickIsimGoster").textContent=isim+" adlı kişiyi atmak istediğine emin misin?"; el("kickPopup").style.display="flex"; popupKapat(); }
-function kickKapat(){ kickHedef=null; el("kickPopup").style.display="none"; }
-async function kickUygula(){
-  if(!kickHedef) return;
-  await sb.from("kicked_users").insert([{room_id: aktifOda.id, name: kickHedef}]);
-  kickKapat();
-}
-async function kickKontrolEt(){
-  if(!aktifIsim) return;
-  const {data} = await sb.from("kicked_users").select("id").eq("room_id", aktifOda.id).eq("name", aktifIsim);
-  if(data && data.length > 0){ alert("Odadan atıldınız!"); cik(); }
-}
-
-// ===== OYLAMA =====
-// ===== OYLAMA =====
-let gorulenPollId = null;
-
-function pollSecenekEkle(){
-  const div = document.createElement("div");
-  div.className = "poll-secenek-input";
-  const n = document.querySelectorAll(".poll-sec-input").length + 1;
-  div.innerHTML = `<input type="text" placeholder="Seçenek ${n}" style="font-size:12px" class="poll-sec-input"/>`;
-  el("pollSecenekler").appendChild(div);
-}
-
-async function pollBaslat(){
-  const soru = el("pollSoru").value.trim();
-  const inputs = document.querySelectorAll(".poll-sec-input");
-  const secenekler = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
-  if(!soru || secenekler.length < 2){ alert("Soru ve en az 2 seçenek gir!"); return; }
-  const {error} = await sb.from("polls").insert([{
-    room_id: aktifOda.id,
-    soru,
-    secenekler: secenekler,
-    oylar: {}
-  }]);
-  if(!error){
-    el("pollSoru").value = "";
-    document.querySelectorAll(".poll-sec-input").forEach(i => i.value = "");
-    el("pollForm").style.display = "none";
-    gorulenPollId = null; // Zorla yenile
-    await pollYukle();   // Anında göster
-  } else {
-    alert("Hata: " + error.message);
-  }
-}
-
-async function oyVer(pollId, secenekIdx){
-  // Önce güncel veriyi çek
-  const {data} = await sb.from("polls").select("oylar,bitti").eq("id", pollId).single();
-  if(!data || data.bitti){ alert("Bu oylama sona erdi!"); return; }
-  const oylar = data.oylar || {};
-  if(oylar[aktifIsim] !== undefined){ alert("Zaten oy kullandınız!"); return; }
-  oylar[aktifIsim] = secenekIdx;
-  await sb.from("polls").update({oylar}).eq("id", pollId);
-  await pollYukle(); // Anında güncelle
-}
-
-async function pollYukle(){
-  const {data} = await sb.from("polls")
-    .select("*")
-    .eq("room_id", aktifOda.id)
-    .eq("bitti", false)
-    .order("created_at", {ascending: false})
-    .limit(1);
-
-  // Biten poll varsa kaldır
-  if(!data || !data.length){
-    const eski = document.getElementById("aktif-poll");
-    if(eski) eski.remove();
-    gorulenPollId = null;
-    return;
-  }
-
-  const p = data[0];
-
-  // Yeni poll mu?
-  if(gorulenPollId !== p.id){
-    const eski = document.getElementById("aktif-poll");
-    if(eski) eski.remove();
-    gorulenPollId = p.id;
-
-    const wrap = document.createElement("div");
-    wrap.id = "aktif-poll";
-    wrap.className = "msg-grup diger";
-    const isimDiv = document.createElement("div");
-    isimDiv.className = "msg-grup-isim";
-    isimDiv.textContent = "🗳️ Oylama";
-    wrap.appendChild(isimDiv);
-    const div = document.createElement("div");
-    div.className = "poll-msg";
-    div.id = "poll-icerik";
-    wrap.appendChild(div);
-
-    // Mesaj alanının en üstüne sabit ekle (mesajların üstünde görünsün)
-    const box = el("mesajlar");
-    box.insertBefore(wrap, box.firstChild);
-  }
-
-  pollRender(p);
-}
-
-function pollRender(p){
-  const div = document.getElementById("poll-icerik");
-  if(!div) return;
-
-  const oylar = p.oylar || {};
-  const toplamOy = Object.keys(oylar).length;
-  const benimOyIdx = oylar[aktifIsim];
-  const secenekler = Array.isArray(p.secenekler) ? p.secenekler : JSON.parse(p.secenekler);
-
-  let html = `<div class="poll-soru">${safe(p.soru)}</div>`;
-
-  secenekler.forEach((s, idx) => {
-    const sayac = Object.values(oylar).filter(o => o === idx).length;
-    const yuzde = toplamOy > 0 ? Math.round(sayac / toplamOy * 100) : 0;
-    const secildi = benimOyIdx === idx;
-    const oyVerildi = benimOyIdx !== undefined;
-
-    html += `<div class="poll-secenek" style="margin-bottom:8px">
-      <div class="poll-bar-wrap">
-        <div class="poll-bar" style="width:${oyVerildi ? yuzde : 0}%"></div>
-        <span class="poll-bar-label">${safe(s)}</span>
-        ${oyVerildi ? `<span class="poll-bar-yuzde">${yuzde}%${secildi?' ✓':''}</span>` : ''}
-      </div>
-      ${!oyVerildi ? `<button class="poll-oy-btn" onclick="oyVer('${p.id}',${idx})">Oy Ver</button>` : ''}
-    </div>`;
-  });
-
-  html += `<div class="poll-toplam">${toplamOy} kişi oy kullandı</div>`;
-  if(yoneticiMi){
-    html += `<button onclick="pollBitir('${p.id}')" style="margin-top:8px;width:100%;padding:7px;border-radius:10px;border:1.5px solid #3a1010;background:#1a0505;color:#f87171;font-size:12px;cursor:pointer;font-family:inherit">⏹ Oylamayı Bitir</button>`;
-  }
-
-  div.innerHTML = html;
-}
-
-async function pollBitir(id){
-  if(!confirm("Oylamayı bitirmek istediğine emin misin?")) return;
-  await sb.from("polls").update({bitti: true}).eq("id", id);
-  const wrap = document.getElementById("aktif-poll");
-  if(wrap) wrap.remove();
-  gorulenPollId = null;
-}
-
-// ===== HESAP SİSTEMİ =====
-let aktifHesap = null;
-
-async function authYukle(){
-  try{
-    const h = localStorage.getItem("mukoChatHesap");
-    if(h){ aktifHesap = JSON.parse(h); }
-  }catch(e){}
-  // Supabase session var mı kontrol et
-  const {data:{session}} = await sb.auth.getSession();
-  if(session && !aktifHesap){
-    const {data:kullanici} = await sb.from("users").select("id,username,email,created_at").eq("id", session.user.id).single();
-    if(kullanici){
-      aktifHesap = {id:kullanici.id, username:kullanici.username, email:kullanici.email, created_at:kullanici.created_at};
-      localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
-    } else {
-      // users tablosunda yok - kullanıcı adı sor
-      gizle("authOverlay");
-      goster("kullaniciAdiOverlay");
-    }
-  }
-  if(!session && aktifHesap){
-    aktifHesap = null;
-    localStorage.removeItem("mukoChatHesap");
-  }
-  authGuncelle();
-}
-
-function navGit(sekme){
-  const dmSayfa = el("dmSayfasi");
-  const anaSayfa = el("anaSayfa");
-  const navDm = el("navDm");
-  const navOda = el("navOda");
-  if(sekme==="dm"){
-    dmSayfa.style.display=""; anaSayfa.style.display="none";
-    navDm.classList.add("aktif"); navOda.classList.remove("aktif");
-    dmArkadasListeYukle(); dmIstekKontrol();
-  } else {
-    dmSayfa.style.display="none"; anaSayfa.style.display="";
-    navOda.classList.add("aktif"); navDm.classList.remove("aktif");
-    odalariYukle();
-  }
-}
-
-function authGuncelle(){
-  const girisli = !!aktifHesap;
-  el("authBtn").style.display = girisli?"none":"";
-  el("profilBtn").style.display = girisli?"":"none";
-  el("cikisBtn").style.display = girisli?"":"none";
-  if(el("authBtn2")){
-    el("authBtn2").style.display = girisli?"none":"";
-    el("profilBtn2").style.display = girisli?"":"none";
-    el("cikisBtn2").style.display = girisli?"":"none";
-  }
-  el("altNav").style.display = "flex";
-  if(girisli){ dmArkadasListeYukle(); dmIstekKontrol(); }
-}
-
-function authAc(){ goster("authOverlay"); ; el("altNav").style.display="none"; }
-function authKapat(){ gizle("authOverlay"); el("altNav").style.display="flex"; }
-function authTab(t){
-  el("girisForm").style.display="none";
-  el("kayitForm").style.display="none";
-  el("sifreUnuttumForm").style.display="none";
-  el("otpForm").style.display="none";
-  el("girisTab").classList.remove("aktif");
-  el("kayitTab").classList.remove("aktif");
-  if(t==="giris"){
-    el("girisForm").style.display="";
-    el("girisTab").classList.add("aktif");
-  } else if(t==="kayit"){
-    el("kayitForm").style.display="";
-    el("kayitTab").classList.add("aktif");
-  } else if(t==="otp"){
-    el("otpForm").style.display="";
-    el("otpEmailGoster").textContent=bekleyenEmail;
-  } else {
-    el("sifreUnuttumForm").style.display="";
-  }
-}
-
-async function kullaniciAdiKaydet(){
-  const ad = el("kullaniciAdiInput").value.trim();
-  const err = el("kullaniciAdiErr");
-  if(!ad || ad.length < 3){ err.textContent = "En az 3 karakter olmalı!"; return; }
-  err.textContent = "Kontrol ediliyor...";
-  const {data:varMi} = await sb.from("users").select("id").eq("username", ad);
-  if(varMi && varMi.length > 0){ err.textContent = "Bu kullanıcı adı alınmış! ❌"; return; }
-  const {data:{session}} = await sb.auth.getSession();
-  if(!session){ err.textContent = "Oturum bulunamadı!"; return; }
-  const {data:yeni, error} = await sb.from("users").insert([{id:session.user.id, username:ad, email:session.user.email}]).select().single();
-  if(error || !yeni){ err.textContent = "Hata: "+(error?.message||""); return; }
-  aktifHesap = {id:yeni.id, username:ad, email:session.user.email, created_at:yeni.created_at};
-  localStorage.setItem("mukoChatHesap", JSON.stringify(aktifHesap));
-  gizle("kullaniciAdiOverlay");
-  el("altNav").style.display="flex";
-  authGuncelle();
-  alert("Hoş geldin, "+ad+"! ✅");
-}
-
-async function githubGiris(){
-  const {error} = await sb.auth.signInWithOAuth({
-    provider: "github",
-    options: { redirectTo: "https://mukobaba.github.io" }
-  });
-  if(error) alert("GitHub hata: "+error.message);
-}
-
-async function googleGiris(){
-  const {error} = await sb.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: "https://mukobaba.github.io" }
-  });
-  if(error) alert("Google hata: "+error.message);
-}
-
-async function hesapCikis(){
-  if(!confirm("Çıkış yapmak istiyor musun?")) return;
-  await sb.auth.signOut();
-  aktifHesap = null;
-  localStorage.removeItem("mukoChatHesap");
-  authGuncelle();
-}
-
-function katSec(btn, kat){
-  document.querySelectorAll(".kat-btn").forEach(b=>b.classList.remove("secili"));
-  btn.classList.add("secili");
-  el("seciliKategori").value = kat;
-}
-
-function yeniOdaKontrol(){
-  if(!aktifHesap){ 
-    alert("Oda oluşturmak için giriş yapman gerekiyor! 👤");
-    authAc();
-    return;
-  }
-  yeniOdaGoster();
-}
-
-
-// ===== PROFİL =====
-async function profilAc(){
-  if(!aktifHesap) return;
-  const ad = aktifHesap.username;
-  el("profilAvatar").textContent = ad[0].toUpperCase();
-  el("profilAdText").textContent = ad;
-  const tarih = new Date(aktifHesap.created_at).toLocaleDateString("tr-TR",{year:"numeric",month:"long",day:"numeric"});
-  el("profilTarih").textContent = "Üyelik: "+tarih+(aktifHesap.email?" • "+aktifHesap.email:"");
-  // Bu kullanıcının kurduğu odalar - owner_key localStorage'da yok
-  // owner_key varsa rooms'dan çekelim
-  const odaDiv = el("profilOdalar");
-  const {data:odalar} = await sb.from("rooms").select("id,name,created_at,owner_key").eq("user_id",aktifHesap.id).order("created_at",{ascending:false});
-  if(!odalar||odalar.length===0){ odaDiv.innerHTML='<div style="color:#2a1e42;font-size:13px">Henüz oda yok</div>'; }
-  else {
-    odaDiv.innerHTML = odalar.map(o=>`
-      <div class="profil-oda-item">
-        <span>#${safe(o.name)}</span>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;color:#2a1e42">${new Date(o.created_at).toLocaleDateString("tr-TR")}</span>
-          <button class="profil-sil-btn" data-id="${o.id}" data-ad="${safe(o.name)}" style="background:#1a0505;border:1px solid #3a1010;color:#f87171;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit">Sil</button>
-        </div>
-      </div>`).join("");
-    odaDiv.querySelectorAll(".profil-sil-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=>profilOdaSil(btn.dataset.id, btn.dataset.ad));
-    });
-  }
-
-  el("profilOverlay").style.display="flex";
-}
-function profilKapat(){ el("profilOverlay").style.display="none"; }
-
-async function profilOdaSil(odaId, odaAd){
-  if(!confirm("#"+odaAd+" odasını silmek istiyor musun? Bu işlem geri alınamaz!")) return;
-  const {error} = await sb.from("rooms").delete().eq("id",odaId);
-  if(error){ alert("Hata: "+error.message); return; }
-  alert("Oda silindi! ✅");
-  profilAc();
-}
-
-// ===== DM SAYFA FONKSİYONLARI =====
-async function dmKullaniciAra(){
-  const q = el("dmAraInput").value.trim();
-  if(!q) return;
-  if(!aktifHesap){ alert("Giriş yapman gerekiyor!"); return; }
-  const sonuc = el("dmAramaSonucSayfa");
-  sonuc.innerHTML='<div style="color:#3d2d5a;font-size:13px">Aranıyor...</div>';
-  const {data} = await sb.from("users").select("id,username").ilike("username","%"+q+"%").neq("id",aktifHesap.id).limit(5);
-  if(!data||!data.length){ sonuc.innerHTML='<div style="color:#2a1e42;font-size:13px">Kullanıcı bulunamadı</div>'; return; }
-  sonuc.innerHTML = data.map(u=>`
-    <div class="arkadas-item">
-      <div class="arkadas-avatar">${u.username[0].toUpperCase()}</div>
-      <div class="arkadas-ad">${safe(u.username)}</div>
-      <button class="arkadas-btn-mor" onclick="istekGonderSayfa('${u.id}','${safe(u.username)}',this)">+ İstek At</button>
-    </div>`).join("");
-}
-
-async function istekGonderSayfa(toId, toAd, btn){
-  btn.disabled=true; btn.textContent="Gönderildi";
-  const {error} = await sb.from("friend_requests").insert([{from_id:aktifHesap.id, to_id:toId, status:"bekliyor"}]);
-  if(error){ btn.disabled=false; btn.textContent="+ İstek At"; alert("Zaten istek atmış olabilirsin!"); }
-}
-
-async function dmArkadasListeYukle(){
-  if(!aktifHesap) return;
-  const div = el("dmArkadasListeSayfa");
-  const {data:g1} = await sb.from("friend_requests").select("from_id,users!friend_requests_from_id_fkey(username)").eq("to_id",aktifHesap.id).eq("status","kabul");
-  const {data:g2} = await sb.from("friend_requests").select("to_id,users!friend_requests_to_id_fkey(username)").eq("from_id",aktifHesap.id).eq("status","kabul");
-  const arkadaslar = [];
-  (g1||[]).forEach(r=>arkadaslar.push({id:r.from_id, username:r.users?.username}));
-  (g2||[]).forEach(r=>arkadaslar.push({id:r.to_id, username:r.users?.username}));
-  if(!arkadaslar.length){ div.innerHTML='<div style="color:#2a1e42;font-size:13px;text-align:center;padding:20px">Henüz arkadaşın yok 😔<br><span style="font-size:11px;color:#1e1a32">Kullanıcı adıyla ara, istek at!</span></div>'; return; }
-  div.innerHTML = arkadaslar.map(u=>`
-    <div class="arkadas-item" onclick="dmAc('${u.id}','${safe(u.username||"?")}')">
-      <div class="arkadas-avatar">${(u.username||"?")[0].toUpperCase()}</div>
-      <div class="arkadas-ad">${safe(u.username||"?")}</div>
-      <span style="color:#3d2d5a;font-size:12px">💬</span>
-    </div>`).join("");
-}
-
-async function dmIstekKontrol(){
-  if(!aktifHesap) return;
-  const {data} = await sb.from("friend_requests").select("id").eq("to_id",aktifHesap.id).eq("status","bekliyor");
-  const div = el("dmIstekBildirim");
-  if(data&&data.length>0){
-    div.style.display="";
-    div.textContent="🔔 "+data.length+" bekleyen arkadaşlık isteği var → görüntüle";
-  } else {
-    div.style.display="none";
-  }
-}
-
-// ===== ARKADAŞ SİSTEMİ =====
-let aktifDmKisi = null;
-let dmInterval = null;
-
-function arkadasAc(){
-  if(!aktifHesap){ alert("Giriş yapman gerekiyor!"); return; }
-  el("arkadasOverlay").style.display="flex";
-  el("arkadasAraInput").value="";
-  el("arkadasAramaSonuc").innerHTML="";
-  arkadasListeYukle();
-  arkadasIstekYukle();
-}
-function arkadasKapat(){ el("arkadasOverlay").style.display="none"; }
-function arkadasTab(t){
-  if(t==="liste"){
-    el("arkadasListeDiv").style.display="";
-    el("arkadasIstekDiv").style.display="none";
-    el("arkadasListeTab").classList.add("aktif");
-    el("arkadasIstekTab").classList.remove("aktif");
-  } else {
-    el("arkadasListeDiv").style.display="none";
-    el("arkadasIstekDiv").style.display="";
-    el("arkadasListeTab").classList.remove("aktif");
-    el("arkadasIstekTab").classList.add("aktif");
-  }
-}
-
-async function kullaniciAra(){
-  const q = el("arkadasAraInput").value.trim();
-  if(!q){ return; }
-  const sonuc = el("arkadasAramaSonuc");
-  sonuc.innerHTML='<div style="color:#3d2d5a;font-size:13px">Aranıyor...</div>';
-  const {data} = await sb.from("users").select("id,username").ilike("username","%"+q+"%").neq("id",aktifHesap.id).limit(5);
-  if(!data||!data.length){ sonuc.innerHTML='<div style="color:#2a1e42;font-size:13px">Kullanıcı bulunamadı</div>'; return; }
-  sonuc.innerHTML = data.map(u=>`
-    <div class="arkadas-item">
-      <div class="arkadas-avatar">${u.username[0].toUpperCase()}</div>
-      <div class="arkadas-ad">${safe(u.username)}</div>
-      <button class="arkadas-btn-mor" onclick="istekGonder('${u.id}','${safe(u.username)}',this)">+ İstek At</button>
-    </div>`).join("");
-}
-
-async function istekGonder(toId, toAd, btn){
-  btn.disabled=true; btn.textContent="Gönderildi";
-  const {error} = await sb.from("friend_requests").insert([{from_id:aktifHesap.id, to_id:toId, status:"bekliyor"}]);
-  if(error){ btn.disabled=false; btn.textContent="+ İstek At"; alert("Hata: zaten istek atmış olabilirsin!"); }
-}
-
-async function arkadasListeYukle(){
-  const div = el("arkadasListeDiv");
-  div.innerHTML='<div style="color:#3d2d5a;font-size:13px">Yükleniyor...</div>';
-  // Karşılıklı kabul edilmiş istekler
-  const {data:g1} = await sb.from("friend_requests").select("from_id,to_id,users!friend_requests_from_id_fkey(username)").eq("to_id",aktifHesap.id).eq("status","kabul");
-  const {data:g2} = await sb.from("friend_requests").select("from_id,to_id,users!friend_requests_to_id_fkey(username)").eq("from_id",aktifHesap.id).eq("status","kabul");
-  const arkadaslar = [];
-  (g1||[]).forEach(r=>arkadaslar.push({id:r.from_id, username:r.users?.username}));
-  (g2||[]).forEach(r=>arkadaslar.push({id:r.to_id, username:r.users?.username}));
-  if(!arkadaslar.length){ div.innerHTML='<div style="color:#2a1e42;font-size:13px;text-align:center;padding:20px">Henüz arkadaşın yok 😔</div>'; return; }
-  div.innerHTML = arkadaslar.map(u=>`
-    <div class="arkadas-item">
-      <div class="arkadas-avatar">${(u.username||"?")[0].toUpperCase()}</div>
-      <div class="arkadas-ad">${safe(u.username||"?")}</div>
-      <button class="arkadas-btn-mor" onclick="dmAc('${u.id}','${safe(u.username)}')">💬 Mesaj</button>
-    </div>`).join("");
-}
-
-async function arkadasIstekYukle(){
-  const div = el("arkadasIstekDiv");
-  const {data} = await sb.from("friend_requests").select("id,from_id,users!friend_requests_from_id_fkey(username)").eq("to_id",aktifHesap.id).eq("status","bekliyor");
-  const badge = el("istekBadge");
-  if(!data||!data.length){
-    badge.style.display="none";
-    div.innerHTML='<div style="color:#2a1e42;font-size:13px;text-align:center;padding:20px">Bekleyen istek yok</div>';
-    return;
-  }
-  badge.style.display="inline"; badge.textContent=data.length;
-  div.innerHTML = data.map(r=>`
-    <div class="arkadas-item">
-      <div class="arkadas-avatar">${(r.users?.username||"?")[0].toUpperCase()}</div>
-      <div class="arkadas-ad">${safe(r.users?.username||"?")}</div>
-      <button class="arkadas-btn-yesil" onclick="istekCevapla('${r.id}','kabul',this)">✓ Kabul</button>
-      <button class="arkadas-btn-kirmizi" onclick="istekCevapla('${r.id}','red',this)">✗ Reddet</button>
-    </div>`).join("");
-}
-
-async function istekCevapla(id, durum, btn){
-  btn.closest(".arkadas-item").style.opacity="0.5";
-  await sb.from("friend_requests").update({status:durum}).eq("id",id);
-  arkadasListeYukle(); arkadasIstekYukle();
-}
-
-// ===== DM =====
-function dmAc(toId, toAd){
-  aktifDmKisi = {id:toId, username:toAd};
-  el("dmIsim").textContent=toAd;
-  el("dmAvatar").textContent=toAd[0].toUpperCase();
-  el("dmMesajlar").innerHTML="";
-  el("dmOverlay").style.display="flex";
-  arkadasKapat();
-  dmMesajlariYukle();
-  if(dmInterval){ clearInterval(dmInterval); dmInterval=null; }
-  dmInterval = setInterval(dmMesajlariYukle, 5000);
-}
-function dmKapat(){
-  el("dmOverlay").style.display="none";
-  if(dmInterval){ clearInterval(dmInterval); dmInterval=null; }
-  aktifDmKisi=null;
-}
-
-async function dmMesajlariYukle(){
-  if(!aktifDmKisi||!aktifHesap) return;
-  const {data} = await sb.from("direct_messages")
-    .select("*")
-    .or(`and(from_id.eq.${aktifHesap.id},to_id.eq.${aktifDmKisi.id}),and(from_id.eq.${aktifDmKisi.id},to_id.eq.${aktifHesap.id})`)
-    .order("created_at",{ascending:true}).limit(100);
-  if(!data) return;
-  const box = el("dmMesajlar");
-  const mevcutSayı = box.querySelectorAll(".dm-msg-wrap").length;
-  if(mevcutSayı===data.length) return;
-  const scrollBottom = box.scrollHeight-box.scrollTop-box.clientHeight<80;
-  box.innerHTML = data.map(m=>{
-    const benim = m.from_id===aktifHesap.id;
-    const saat = new Date(m.created_at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
-    return `<div class="dm-msg-wrap" style="display:flex;flex-direction:column;align-items:${benim?"flex-end":"flex-start"}">
-      <div class="dm-msg ${benim?"benim":"diger"}">${safe(m.message)}</div>
-      <div class="dm-msg-saat">${saat}</div>
-    </div>`;
-  }).join("");
-  if(scrollBottom||mevcutSayı===0) box.scrollTop=box.scrollHeight;
-}
-
-async function dmGonder(){
-  const msg = el("dmInput").value.trim();
-  if(!msg||!aktifDmKisi||!aktifHesap) return;
-  el("dmInput").value=""; el("dmInput").style.height="auto";
-  await sb.from("direct_messages").insert([{from_id:aktifHesap.id, to_id:aktifDmKisi.id, message:msg}]);
-  dmMesajlariYukle();
-}
-
-// Klavye takibi - sesli komut dahil
-document.addEventListener('focusin', function(e){
-  if(e.target && e.target.id === 'mesajInput'){
-    setTimeout(setirChatYukseklik, 150);
-    setTimeout(setirChatYukseklik, 400);
-  }
-});
-
-// Başlat
-authYukle();
 odalariYukle();
-
-// Supabase uyanık tut - 30 saniyede bir ping
-setInterval(async()=>{
-  try{ await sb.from("rooms").select("id").limit(1); }
-  catch(e){}
-}, 30000);
 </script>
 </body>
+</html>
+</html>
+</html>
 </html>
