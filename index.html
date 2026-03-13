@@ -279,6 +279,14 @@
     .new-room-btn { animation: slideUp 0.4s cubic-bezier(0.2,0.8,0.4,1); }
     .overlay { animation: fadeIn 0.35s ease; }
 
+    /* ===== MESAJ ANİMASYON ===== */
+    @keyframes msgSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg-grup.yeni { animation: msgSlideUp 0.3s cubic-bezier(0.2,0.8,0.4,1); }
+    .msg.yeni { animation: msgSlideUp 0.3s cubic-bezier(0.2,0.8,0.4,1); }
+
     /* ===== KATEGORİ ===== */
     .kat-btn { background: #0c0c14; border: 1.5px solid #1e1a32; border-radius: 20px; padding: 5px 12px; font-size: 12px; color: #4a3a6a; cursor: pointer; font-family: inherit; transition: all 0.2s; }
     .kat-btn.secili { background: #1e1a32; border-color: #6d28d9; color: #a78bfa; }
@@ -706,7 +714,7 @@
   </div>
 </div>
 
-<div class="ver">v8.3</div>
+<div class="ver">v8.4</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1028,7 +1036,7 @@ function mesajEkle(m){
   let grup;
   if(!sonGrup || oncekiIsim !== m.name){
     grup = document.createElement("div");
-    grup.className = "msg-grup "+(benimMi?"benim":"diger");
+    grup.className = "msg-grup yeni "+(benimMi?"benim":"diger");
     const isimDiv = document.createElement("div");
     isimDiv.className = "msg-grup-isim";
     isimDiv.textContent = m.name;
@@ -1038,7 +1046,7 @@ function mesajEkle(m){
     grup = sonGrup;
   }
   const div = document.createElement("div");
-  div.className = "msg "+(benimMi?"benim":"diger");
+  div.className = "msg yeni "+(benimMi?"benim":"diger");
   div.dataset.id = m.id; div.dataset.isim = m.name; div.dataset.mesaj = m.message;
   const saat = new Date(m.created_at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
   const alintiBlok = m.reply_to?`<div class="alinti-blok">↩ ${safe(m.reply_to)}</div>`:"";
