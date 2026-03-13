@@ -412,7 +412,7 @@
     button { touch-action: manipulation; cursor: pointer; }
   </style>
 
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -469,9 +469,6 @@
     <input id="authSifre" autocomplete="current-password" type="password" placeholder="Şifre (en az 6 karakter)" style="margin-bottom:8px" />
     <input id="authSifre2" type="password" placeholder="Şifreyi tekrar gir" style="margin-bottom:8px;display:none" />
     <input id="authIsim" type="text" placeholder="Kullanıcı adı (en az 3 karakter)" maxlength="20" autocomplete="off" style="margin-bottom:8px;display:none" />
-    <div id="recaptchaWrap" style="display:none;margin-bottom:8px">
-      <div class="g-recaptcha" data-sitekey="6LdLaYksAAAAAM7Em1DpjEXL4k8o-IX8Ill2HPrg" data-callback="recaptchaOk" data-expired-callback="recaptchaTemizle"></div>
-    </div>
     <div class="err" id="authErr"></div>
     <button class="btn" id="authSubmitBtn" onclick="authSubmit()" style="margin-top:0">Giriş Yap</button>
 
@@ -760,20 +757,20 @@
   </div>
 </div>
 
-<div class="ver">v12.0</div>
+<div class="ver">v13.1</div>
 
 <!-- DOĞRULAMA KODU -->
 <div class="overlay" id="dogrulamaOverlay" style="display:none">
   <div class="kvkk-box" style="text-align:center;max-width:380px">
-    <div style="font-size:48px;margin-bottom:12px">🔐</div>
-    <div class="kvkk-title">Hesabını Doğrula</div>
-    <div style="font-size:13px;color:#4a3a6a;margin-bottom:16px;line-height:1.6">
-      Aşağıdaki 6 haneli kodu gir ve hesabını doğrula.
+    <div style="font-size:48px;margin-bottom:12px">📧</div>
+    <div class="kvkk-title">E-postanı Doğrula</div>
+    <div id="dogrulamaMesaj" style="font-size:13px;color:#4a3a6a;margin-bottom:16px;line-height:1.6">
+      E-posta adresine 6 haneli doğrulama kodu gönderildi.
     </div>
-    <div id="dogrulamaKodGoster" style="font-size:36px;font-weight:700;color:#a78bfa;letter-spacing:8px;padding:16px;background:#0c0c14;border-radius:12px;border:1px solid #3b1f6e;margin-bottom:16px">------</div>
-    <input id="dogrulamaKodInput" type="number" placeholder="Kodu gir" maxlength="6" style="text-align:center;font-size:24px;letter-spacing:6px;margin-bottom:8px" />
+    <input id="dogrulamaKodInput" type="number" placeholder="6 haneli kodu gir" maxlength="6" style="text-align:center;font-size:24px;letter-spacing:6px;margin-bottom:8px" />
     <div class="err" id="dogrulamaErr"></div>
     <button class="btn" onclick="dogrulamaKodKontrol()" style="margin-bottom:8px">✅ Doğrula</button>
+    <button class="btn" onclick="dogrulamaTekrarGonder()" style="background:#1e1a32;border:1.5px solid #3b1f6e;color:#a78bfa;margin-bottom:8px">📨 Tekrar gönder</button>
     <button class="btn btn-gray" onclick="dogrulamaCikis()">İptal</button>
   </div>
 </div>
@@ -819,6 +816,7 @@ if(localStorage.getItem("kvkk")==="1"){document.getElementById("kvkkOverlay").st
 <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app-check.js"></script>
 <script>
 // ===== FİREBASE BAŞLAT =====
 
@@ -830,6 +828,8 @@ firebase.initializeApp({
   messagingSenderId:"716674607770",
   appId:"1:716674607770:web:e715a7e49c76d10fedcd23"
 });
+const appCheck = firebase.appCheck();
+appCheck.activate("6Lceb4ksAAAAAPhDpStmR9tBAn8sUvc8pDsKoEN2", true);
 const auth = firebase.auth();
 const db = firebase.firestore();
 db.settings({ experimentalForceLongPolling: true, merge: true });
@@ -874,9 +874,6 @@ function authAc(){goster("authOverlay");el("altNav").style.display="none";hataGi
 function authKapat(){gizle("authOverlay");el("altNav").style.display="flex";}
 
 let aktifAuthTab = "giris";
-let _recaptchaToken = null;
-function recaptchaOk(token){_recaptchaToken=token;}
-function recaptchaTemizle(){_recaptchaToken=null;}
 function authTab(tab){
   aktifAuthTab=tab;
   if(tab==="giris"){
@@ -900,14 +897,46 @@ async function authSubmit(){
 }
 
 let _dogrulamaKod=null;
-function dogrulamaAc(){
+let _dogrulamaEmail=null;
+let _dogrulamaIsim=null;
+
+emailjs.init("3IaHVk32X68cxsjad");
+
+async function dogrulamaAc(email, isim){
   _dogrulamaKod=Math.floor(100000+Math.random()*900000).toString();
-  el("dogrulamaKodGoster").textContent=_dogrulamaKod;
+  _dogrulamaEmail=email;
+  _dogrulamaIsim=isim;
   el("dogrulamaKodInput").value="";
   el("dogrulamaOverlay").style.display="flex";
   el("altNav").style.display="none";
   if(el("dogrulamaErr"))el("dogrulamaErr").style.display="none";
+  el("dogrulamaMesaj").textContent=email+" adresine 6 haneli kod gönderiliyor...";
+  await dogrulamaMailGonder();
 }
+
+async function dogrulamaMailGonder(){
+  try{
+    const now = new Date();
+    const time = now.toLocaleTimeString("tr-TR")+", "+now.toLocaleDateString("tr-TR");
+    await emailjs.send("service_cyjyoo6","template_2b35i4g",{
+      to_email: _dogrulamaEmail,
+      to_name: _dogrulamaIsim||"Kullanıcı",
+      passcode: _dogrulamaKod,
+      time: time
+    });
+    el("dogrulamaMesaj").textContent=_dogrulamaEmail+" adresine kod gönderildi. Spam kutusunu da kontrol et!";
+  }catch(e){
+    el("dogrulamaMesaj").textContent="E-posta gönderilemedi: "+e.text+". Kod: "+_dogrulamaKod;
+  }
+}
+
+async function dogrulamaTekrarGonder(){
+  _dogrulamaKod=Math.floor(100000+Math.random()*900000).toString();
+  el("dogrulamaErr").style.display="none";
+  el("dogrulamaMesaj").textContent="Yeni kod gönderiliyor...";
+  await dogrulamaMailGonder();
+}
+
 function dogrulamaKodKontrol(){
   const girilen=el("dogrulamaKodInput").value.trim();
   if(girilen===_dogrulamaKod){
@@ -954,7 +983,6 @@ async function emailKayit(){
   const sifre2=el("authSifre2").value;
   const isim=el("authIsim").value.trim();
   if(!email||!sifre||!sifre2||!isim){hata("authErr","Tüm alanları doldur!");return;}
-  if(!_recaptchaToken){hata("authErr","Lütfen robot olmadığını doğrula!");return;}
   if(sifre.length<6){hata("authErr","Şifre en az 6 karakter!");return;}
   if(sifre!==sifre2){hata("authErr","Şifreler eşleşmiyor! ❌");return;}
   if(isim.length<3){hata("authErr","Kullanıcı adı en az 3 karakter!");return;}
@@ -964,11 +992,12 @@ async function emailKayit(){
   hata("authErr","Kayıt olunuyor...");
   try{
     const cred=await auth.createUserWithEmailAndPassword(email,sifre);
+    const kisaId="#"+cred.user.uid.substring(0,6).toUpperCase();
     await db.collection("users").doc(cred.user.uid).set({
-      username:isim,email:email,createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      username:isim,email:email,kisaId:kisaId,createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     authKapat();
-    dogrulamaAc();
+    dogrulamaAc(email, isim);
   }
   catch(e){hata("authErr","Hata: "+e.message);}
 }
@@ -1022,6 +1051,7 @@ auth.onAuthStateChanged(async(user)=>{
 function authGuncelle(){
   const g=!!aktifHesap;
   el("authBtn").style.display=g?"none":"";
+  if(el("authBtn2"))el("authBtn2").style.display=g?"none":"";
   el("profilBtn").style.display=g?"":"none";
   if(el("profilBtn2"))el("profilBtn2").style.display=g?"":"none";
   el("cikisBtn").style.display=g?"":"none";
@@ -1034,7 +1064,7 @@ async function odalariYukle(){
   try{
     const snap=await db.collection("rooms").orderBy("createdAt","desc").get();
     tumOdalar=snap.docs.map(d=>({id:d.id,...d.data()}));
-    odalariGoster(tumOdalar);baglantiGoster(true);
+    odalariGoster(tumOdalar);baglantiDurumu(true);
   }catch(e){baglantiDurumu(false);console.error(e);}
 }
 function odalariGoster(odalar){
@@ -1396,11 +1426,6 @@ async function cik(){
 function anaSayfayaDon(){gizle("sifreSayfasi");gizle("isimSayfasi");goster("anaSayfa");}
 
 let baglantiOk=true,baglantiGizleTimer=null;
-function baglantiGoster(ok){
-  // Her girişte göster
-  baglantiOk = !ok;
-  baglantiDurumu(ok);
-}
 // Show red on load, green when connected
 function baglantiGoster(msg, online){
   const bar=el("baglantiBar");
@@ -1408,7 +1433,7 @@ function baglantiGoster(msg, online){
   bar.className="baglanti-bar"+(online?" online":"");
   bar.style.display="block";
   bar.style.animation="none";
-  setTimeout(()=>bar.style.animation="slideFromBottom 0.4s cubic-bezier(0.2,0.8,0.4,1)",10);
+  setTimeout(()=>bar.style.animation="slideFromTop 0.4s cubic-bezier(0.2,0.8,0.4,1)",10);
   if(online){
     if(baglantiGizleTimer)clearTimeout(baglantiGizleTimer);
     baglantiGizleTimer=setTimeout(()=>{bar.style.display="none";},3000);
@@ -1464,8 +1489,9 @@ async function profilAc(){
   el("profilAdText").textContent=ad;
   const tarih=new Date(aktifHesap.created_at).toLocaleDateString("tr-TR",{year:"numeric",month:"long",day:"numeric"});
   el("profilTarih").textContent="Üyelik: "+tarih+(aktifHesap.email?" • "+aktifHesap.email:"");
+  const idDiv=el("profilKisaId");if(idDiv)idDiv.textContent="🪪 ID: "+(aktifHesap.kisaId||("#"+aktifHesap.id.substring(0,6).toUpperCase()));
   const odaDiv=el("profilOdalar");
-  const snap=await db.collection("rooms").where("ownerId","==",aktifHesap.id).orderBy("createdAt","desc").get();
+  const snap=await db.collection("rooms").where("ownerId","==",aktifHesap.id).get();
   if(snap.empty){odaDiv.innerHTML='<div style="color:#2a1e42;font-size:13px">Henüz oda yok</div>';}
   else{
     odaDiv.innerHTML=snap.docs.map(d=>`<div class="profil-oda-item"><span>#${safe(d.data().name)}</span><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:#2a1e42">${d.data().createdAt?.toDate?.()?.toLocaleDateString("tr-TR")||""}</span><button class="profil-sil-btn" data-id="${d.id}" data-ad="${safe(d.data().name)}" style="background:#1a0505;border:1px solid #3a1010;color:#f87171;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit">Sil</button></div></div>`).join("");
