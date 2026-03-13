@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <title>MukoCan Chat</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -774,7 +774,7 @@
   </div>
 </div>
 
-<div class="ver">v14.3</div>
+<div class="ver">v14.4</div>
 
 <!-- DOĞRULAMA KODU -->
 <div class="overlay" id="dogrulamaOverlay" style="display:none">
@@ -895,13 +895,28 @@ function chatGoster(){
 }
 function setirChatYukseklik(){
   const vv=window.visualViewport;
-  const h=vv?vv.height:window.innerHeight,y=vv?vv.offsetTop:0;
+  const h=vv?vv.height:window.innerHeight;
+  const y=vv?vv.offsetTop:0;
   const chat=el("chatSayfasi");
-  chat.style.position="fixed";chat.style.top=y+"px";
-  chat.style.left="0";chat.style.right="0";chat.style.height=h+"px";
+  // Fix chat to full visible area
+  chat.style.position="fixed";
+  chat.style.top=y+"px";
+  chat.style.left="0";chat.style.right="0";
+  chat.style.height=h+"px";
   chat.style.maxWidth="460px";chat.style.margin="0 auto";
+  // Header always visible at top
+  const header=chat.querySelector(".chat-header");
+  if(header){header.style.position="sticky";header.style.top="0";header.style.zIndex="10";header.style.flexShrink="0";}
+  // Messages fill remaining space
   const box=el("mesajlar");
-  if(box)setTimeout(()=>{box.scrollTop=box.scrollHeight;},80);
+  const kutu=el("mesajKutu")?.closest(".chat-input-wrap")||el("mesajKutu")?.parentElement;
+  if(box&&header){
+    const headerH=header.offsetHeight||56;
+    const kutuH=kutu?kutu.offsetHeight:60;
+    box.style.height=(h-headerH-kutuH-8)+"px";
+    box.style.overflowY="auto";
+  }
+  if(box)setTimeout(()=>{box.scrollTop=box.scrollHeight;},50);
 }
 
 
