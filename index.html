@@ -721,7 +721,7 @@
   </div>
 </div>
 
-<div class="ver">v9.6</div>
+<div class="ver">v9.8</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- ALT NAV -->
@@ -1007,10 +1007,11 @@ async function sohbeteGir(){
   // Polling sadece online/kick/durum için (daha seyrek)
   timer=setInterval(async()=>{
     try{
+      await mesajlariYukle();
       await onlineGuncelle();await odaDurumGuncelle();await kickKontrolEt();
       baglantiDurumu(true);
     }catch(e){ baglantiDurumu(false); }
-  },4000);
+  },3000);
   presTimer=setInterval(presenceYenile,10000);
   // el("mesajIn").focus(); // klavye açılmasın
 }
