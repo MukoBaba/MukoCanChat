@@ -87,8 +87,23 @@
     .durum-dot { width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; margin-left: auto; flex-shrink: 0; }
     .durum-dot.ok { background: #34d399; box-shadow: 0 0 5px #34d399; }
     .duyuru-bar { background: rgba(124,58,237,0.08); border-bottom: 1px solid #2a1a48; padding: 7px 16px; text-align: center; font-size: 12px; color: #fbbf24; flex-shrink: 0; display: none; }
-    .baglanti-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 9000; background: #7f1d1d; color: #fca5a5; font-size: 12px; font-weight: 600; padding: 8px 16px; text-align: center; display: none; }
-    .baglanti-bar.online { background: #14532d; color: #86efac; }
+    @keyframes slideUp { from { transform: translate(-50%, 100%); opacity:0; } to { transform: translate(-50%, 0); opacity:1; } }
+    .baglanti-bar {
+      position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; max-width: 340px; width: 90%;
+      background: #ff1a1a;
+      color: #fff;
+      font-size: 13px; font-weight: 700;
+      padding: 11px 18px; text-align: center; display: none;
+      border-radius: 14px;
+      box-shadow: 0 0 20px rgba(255,30,30,0.6), 0 4px 24px rgba(0,0,0,0.5);
+      animation: slideUp 0.4s cubic-bezier(0.2,0.8,0.4,1);
+    }
+    .baglanti-bar.online {
+      background: #16a34a;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(22,163,74,0.5), 0 4px 24px rgba(0,0,0,0.5);
+    }
     .duyuru-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 8888; background: linear-gradient(135deg,#6d28d9,#7c3aed); color: #fff; font-size: 13px; font-weight: 600; padding: 12px 16px; text-align: center; display: none; animation: slideDown 0.4s cubic-bezier(0.2,0.8,0.4,1); box-shadow: 0 4px 20px rgba(109,40,217,0.5); cursor: pointer; max-width: 460px; margin: 0 auto; border-radius: 0 0 14px 14px; }
     @keyframes slideDown { from { transform: translateY(-100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
 
@@ -385,6 +400,10 @@
     .alt-nav-btn .nav-icon { font-size: 22px; }
     .alt-nav-divider { width: 1px; background: #1e1a32; margin: 8px 0; }
     body { padding-bottom: 60px; }
+    :root { --msg-font-size: 14px; }
+    .msg-icerik { font-size: var(--msg-font-size) !important; }
+    #mesajIn { font-size: var(--msg-font-size) !important; }
+    .dm-msg { font-size: var(--msg-font-size) !important; }
 
     * { -webkit-tap-highlight-color: transparent; }
     body { touch-action: pan-y; -webkit-overflow-scrolling: touch; user-select: none; }
@@ -568,7 +587,10 @@
 <div id="anaSayfa" style="height:100%;overflow-y:auto;">
   <div class="wrap">
     <div class="logo">
-      <div class="logo-title">MukoCan Chat</div>
+      <div style="position:relative">
+        <button onclick="yaziBoyutuAc()" style="position:absolute;left:0;top:0;background:#1e1a32;border:1px solid #2a1e42;border-radius:8px;color:#6d4aa0;font-size:13px;cursor:pointer;padding:4px 8px;line-height:1">⚙️</button>
+        <div class="logo-title">MukoCan Chat</div>
+      </div>
       <div class="logo-sub">Bir odaya gir veya yeni oda oluştur</div>
       <div style="margin-top:12px;display:flex;justify-content:center;gap:8px">
         <button class="auth-header-btn" id="authBtn" onclick="authAc()">👤 Giriş Yap / Kayıt Ol</button>
@@ -738,7 +760,7 @@
   </div>
 </div>
 
-<div class="ver">v11.2</div>
+<div class="ver">v12.0</div>
 
 <!-- DOĞRULAMA KODU -->
 <div class="overlay" id="dogrulamaOverlay" style="display:none">
@@ -756,6 +778,25 @@
   </div>
 </div>
 
+<!-- YAZI BOYUTU -->
+<div class="overlay" id="yaziBoyutuOverlay" style="display:none">
+  <div class="kvkk-box" style="max-width:320px;text-align:center">
+    <div class="kvkk-title">🔤 Yazı Boyutu</div>
+    <div style="font-size:13px;color:#4a3a6a;margin-bottom:16px">Sadece mesaj yazıları etkilenir</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px">
+      <button onclick="yaziBoyutuDegistir(-1)" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #3b1f6e;background:#1e1a32;color:#a78bfa;font-size:22px;cursor:pointer">−</button>
+      <span id="yaziBoyutuGoster" style="font-size:28px;font-weight:700;color:#a78bfa;min-width:50px">14</span>
+      <button onclick="yaziBoyutuDegistir(1)" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #3b1f6e;background:#1e1a32;color:#a78bfa;font-size:22px;cursor:pointer">+</button>
+    </div>
+    <div style="padding:12px;background:#0c0c14;border-radius:10px;border:1px solid #1e1a32;margin-bottom:16px">
+      <span style="font-size:13px;color:#4a3a6a">Önizleme: </span>
+      <span id="yaziBoyutuOnizleme" style="color:#e2d9f3">Merhaba! Bu bir test mesajıdır.</span>
+    </div>
+    <button class="btn" onclick="yaziBoyutuKaydet()">💾 Kaydet</button>
+    <button class="btn btn-gray" onclick="yaziBoyutuKapat()" style="margin-top:6px">Kapat</button>
+  </div>
+</div>
+
 <!-- ALT NAV -->
 <div class="alt-nav" id="altNav" style="display:none">
   <button class="alt-nav-btn" id="navDm" onclick="navGit('dm')">
@@ -767,6 +808,7 @@
     <span class="nav-icon">🏠</span>
     <span>Odalar</span>
   </button>
+
 </div>
 
 <script>
@@ -992,7 +1034,7 @@ async function odalariYukle(){
   try{
     const snap=await db.collection("rooms").orderBy("createdAt","desc").get();
     tumOdalar=snap.docs.map(d=>({id:d.id,...d.data()}));
-    odalariGoster(tumOdalar);baglantiDurumu(true);
+    odalariGoster(tumOdalar);baglantiGoster(true);
   }catch(e){baglantiDurumu(false);console.error(e);}
 }
 function odalariGoster(odalar){
@@ -1354,10 +1396,65 @@ async function cik(){
 function anaSayfayaDon(){gizle("sifreSayfasi");gizle("isimSayfasi");goster("anaSayfa");}
 
 let baglantiOk=true,baglantiGizleTimer=null;
+function baglantiGoster(ok){
+  // Her girişte göster
+  baglantiOk = !ok;
+  baglantiDurumu(ok);
+}
+// Show red on load, green when connected
+function baglantiGoster(msg, online){
+  const bar=el("baglantiBar");
+  bar.textContent=msg;
+  bar.className="baglanti-bar"+(online?" online":"");
+  bar.style.display="block";
+  bar.style.animation="none";
+  setTimeout(()=>bar.style.animation="slideFromBottom 0.4s cubic-bezier(0.2,0.8,0.4,1)",10);
+  if(online){
+    if(baglantiGizleTimer)clearTimeout(baglantiGizleTimer);
+    baglantiGizleTimer=setTimeout(()=>{bar.style.display="none";},3000);
+  }
+}
+window.addEventListener("load", function(){
+  setTimeout(()=>{
+    baglantiGoster("🔴 Bağlanıyor, lütfen bekle...", false);
+    // Try firestore ping
+    db.collection("rooms").limit(1).get()
+      .then(()=>baglantiGoster("🟢 Bağlandı! Hazırım.", true))
+      .catch(()=>baglantiGoster("🔴 Bağlantı kurulamadı!", false));
+  },800);
+});
+
+const baglantiKesikMesajlar = [
+  "😢 Seni kaybettim, geri dönmeyi bekliyorum...",
+  "💔 Bağlantım koptu, yalnız hissediyorum...",
+  "😰 Bir şeyler ters gitti, düzeltmeye çalışıyorum...",
+  "🥺 Seninle konuşamıyorum şu an, birazdan döneceğim...",
+];
+const baglantiGeriMesajlar = [
+  "🥰 Geri döndüm, seni çok özledim!",
+  "✨ Bağlantı kuruldu, yeniden birlikteyiz!",
+  "💫 İşte geldim! Her şey yolunda.",
+  "🎉 Bağlandım! Devam edebiliriz.",
+];
 function baglantiDurumu(ok){
   const bar=el("baglantiBar");
-  if(!ok&&baglantiOk){baglantiOk=false;bar.textContent="⚠️ Bağlantı kesildi...";bar.className="baglanti-bar";bar.style.display="block";}
-  else if(ok&&!baglantiOk){baglantiOk=true;bar.textContent="✅ Bağlantı yeniden kuruldu!";bar.className="baglanti-bar online";bar.style.display="block";if(baglantiGizleTimer)clearTimeout(baglantiGizleTimer);baglantiGizleTimer=setTimeout(()=>{bar.style.display="none";},3000);}
+  if(!ok&&baglantiOk){
+    baglantiOk=false;
+    bar.textContent=baglantiKesikMesajlar[Math.floor(Math.random()*baglantiKesikMesajlar.length)];
+    bar.className="baglanti-bar";
+    bar.style.display="block";
+    bar.style.animation="none";
+    setTimeout(()=>bar.style.animation="slideUp 0.4s cubic-bezier(0.2,0.8,0.4,1)",10);
+  } else if(ok&&!baglantiOk){
+    baglantiOk=true;
+    bar.textContent=baglantiGeriMesajlar[Math.floor(Math.random()*baglantiGeriMesajlar.length)];
+    bar.className="baglanti-bar online";
+    bar.style.display="block";
+    bar.style.animation="none";
+    setTimeout(()=>bar.style.animation="slideUp 0.4s cubic-bezier(0.2,0.8,0.4,1)",10);
+    if(baglantiGizleTimer)clearTimeout(baglantiGizleTimer);
+    baglantiGizleTimer=setTimeout(()=>{bar.style.display="none";},3000);
+  }
 }
 
 async function profilAc(){
@@ -1526,6 +1623,25 @@ document.addEventListener("keydown",e=>{
   else if(el("yeniOdaForm").style.display!=="none")odaOlustur();
 });
 window.addEventListener("beforeunload",()=>{if(presenceRef)presenceRef.delete().catch(()=>{});});
+
+let _yaziBoyutu = parseInt(localStorage.getItem("yaziBoyutu")||"14");
+function yaziBoyutuUygula(){
+  document.documentElement.style.setProperty("--msg-font-size", _yaziBoyutu+"px");
+  if(el("yaziBoyutuGoster"))el("yaziBoyutuGoster").textContent=_yaziBoyutu;
+  if(el("yaziBoyutuOnizleme"))el("yaziBoyutuOnizleme").style.fontSize=_yaziBoyutu+"px";
+}
+function yaziBoyutuAc(){
+  el("yaziBoyutuOverlay").style.display="flex";
+  yaziBoyutuUygula();
+}
+function yaziBoyutuKapat(){el("yaziBoyutuOverlay").style.display="none";}
+function yaziBoyutuKaydet(){localStorage.setItem("yaziBoyutu",_yaziBoyutu);yaziBoyutuKapat();alert("Yazı boyutu kaydedildi! ✅");}
+function yaziBoyutuDegistir(delta){
+  _yaziBoyutu=Math.min(24,Math.max(10,_yaziBoyutu+delta));
+  localStorage.setItem("yaziBoyutu",_yaziBoyutu);
+  yaziBoyutuUygula();
+}
+yaziBoyutuUygula();
 
 odalariYukle();
 </script>
